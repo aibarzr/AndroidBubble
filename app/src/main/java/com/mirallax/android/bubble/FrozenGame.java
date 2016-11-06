@@ -6,9 +6,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.mirallax.android.bubble.manager.BubbleManager;
+import com.mirallax.android.bubble.manager.LevelManager;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 import com.mirallax.android.bubble.sprite.BubbleSprite;
 import com.mirallax.android.bubble.sprite.ImageSprite;
+import com.mirallax.android.bubble.sprite.LaunchBubbleSprite;
 import com.mirallax.android.bubble.sprite.Sprite;
 
 import java.util.Vector;
@@ -269,7 +272,6 @@ public class FrozenGame extends GameScreen {
     int launchBubbleId = map.getInt("launchBubbleId");
     launchBubble = (LaunchBubbleSprite)savedSprites.elementAt(launchBubbleId);
     launchBubblePosition = map.getDouble("launchBubblePosition");
-    int penguinId = map.getInt("penguinId");
     compressor.restoreState(map);
     int nextBubbleId = map.getInt("nextBubbleId");
     nextBubble = (ImageSprite)savedSprites.elementAt(nextBubbleId);

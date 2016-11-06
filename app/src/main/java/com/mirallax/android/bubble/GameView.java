@@ -18,6 +18,7 @@ import android.view.SurfaceView;
 import android.view.MotionEvent;
 
 import com.mirallax.android.R;
+import com.mirallax.android.bubble.manager.LevelManager;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 import com.mirallax.android.bubble.sprite.Sprite;
 

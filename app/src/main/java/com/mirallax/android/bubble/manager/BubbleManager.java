@@ -1,4 +1,4 @@
-package com.mirallax.android.bubble;
+package com.mirallax.android.bubble.manager;
 
 import java.util.Random;
 import android.os.Bundle;
@@ -75,11 +75,6 @@ public class BubbleManager
                 }
 
                 return position;
-        }
-
-        public BmpWrap nextBubble(Random rand)
-        {
-                return bubbles[nextBubbleIndex(rand)];
         }
 
         private int findBubble(BmpWrap bubble)

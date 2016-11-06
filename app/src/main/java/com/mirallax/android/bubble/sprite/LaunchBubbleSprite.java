@@ -1,10 +1,11 @@
-package com.mirallax.android.bubble;
+package com.mirallax.android.bubble.sprite;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import com.mirallax.android.bubble.FrozenBubble;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 import com.mirallax.android.bubble.sprite.Sprite;
 

@@ -209,7 +209,6 @@ public class FrozenBubble extends Activity
    */
   @Override
   protected void onSaveInstanceState(Bundle outState) {
-    // Just have the View's thread save its state into our Bundle.
     super.onSaveInstanceState(outState);
     mGameThread.saveState(outState);
   }
@@ -223,7 +222,6 @@ public class FrozenBubble extends Activity
       if (!activityCustomStarted) {
         activityCustomStarted = true;
 
-        // Get custom level last played.
         SharedPreferences sp = getSharedPreferences(
             FrozenBubble.PREFS_NAME, Context.MODE_PRIVATE);
         int startingLevel = sp.getInt("levelCustom", 0);

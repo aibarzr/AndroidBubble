@@ -1,4 +1,4 @@
-package com.mirallax.android.bubble;
+package com.mirallax.android.bubble.manager;
 
 import android.os.Bundle;
 import java.util.Vector;

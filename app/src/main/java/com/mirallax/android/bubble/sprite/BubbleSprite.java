@@ -7,8 +7,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 
-import com.mirallax.android.bubble.BubbleManager;
-import com.mirallax.android.bubble.FrozenBubble;
+import com.mirallax.android.bubble.manager.BubbleManager;
 import com.mirallax.android.bubble.FrozenGame;
 
 public class BubbleSprite extends Sprite
