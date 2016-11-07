@@ -5,10 +5,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import com.mirallax.android.bubble.FrozenBubble;
-import com.mirallax.android.bubble.sprite.BmpWrap;
-import com.mirallax.android.bubble.sprite.Sprite;
-
 import java.util.Vector;
 
 public class LaunchBubbleSprite extends Sprite

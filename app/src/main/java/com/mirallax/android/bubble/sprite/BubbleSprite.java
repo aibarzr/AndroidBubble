@@ -24,7 +24,6 @@ public class BubbleSprite extends Sprite
   private double realX, realY;
 
   private boolean fixed;
-  private boolean blink;
   private boolean released;
 
   private boolean checkJump;
@@ -44,7 +43,6 @@ public class BubbleSprite extends Sprite
     map.putDouble(String.format("%d-realX", getSavedId()), realX);
     map.putDouble(String.format("%d-realY", getSavedId()), realY);
     map.putBoolean(String.format("%d-fixed", getSavedId()), fixed);
-    map.putBoolean(String.format("%d-blink", getSavedId()), blink);
     map.putBoolean(String.format("%d-released", getSavedId()), released);
     map.putBoolean(String.format("%d-checkJump", getSavedId()), checkJump);
     map.putBoolean(String.format("%d-checkFall", getSavedId()), checkFall);
@@ -57,7 +55,7 @@ public class BubbleSprite extends Sprite
   }
 
   public BubbleSprite(Rect area, int color, double moveX, double moveY,
-                      double realX, double realY, boolean fixed, boolean blink,
+                      double realX, double realY, boolean fixed,
                       boolean released, boolean checkJump, boolean checkFall,
                       int fixedAnim, BmpWrap bubbleFace,
                       BubbleManager bubbleManager,
@@ -70,7 +68,6 @@ public class BubbleSprite extends Sprite
     this.realX = realX;
     this.realY = realY;
     this.fixed = fixed;
-    this.blink = blink;
     this.released = released;
     this.checkJump = checkJump;
     this.checkFall = checkFall;
@@ -408,11 +405,6 @@ public class BubbleSprite extends Sprite
     if (realY >= 680.) {
       frozen.deleteFallingBubble(this);
     }
-  }
-
-  public void blink()
-  {
-    blink = true;
   }
 
 

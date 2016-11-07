@@ -49,13 +49,6 @@ public abstract class Sprite
 
   public abstract int getTypeId();
 
-  public void changeSpriteArea(Rect newArea)
-  {
-    spriteArea = newArea;
-  }
-
-
-
   public final void absoluteMove(Point p)
   {
     spriteArea = new Rect(spriteArea);
