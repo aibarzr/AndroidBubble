@@ -182,7 +182,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         BitmapFactory.decodeResource(res, R.drawable.compressor, options);
       mCompressorOrig =
         BitmapFactory.decodeResource(res, R.drawable.compressor_body, options);
-      mLifeOrig = BitmapFactory.decodeResource(res, R.drawable.life, options);
       mFontImageOrig =
         BitmapFactory.decodeResource(res, R.drawable.bubble_font, options);
 
@@ -270,7 +269,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       scaleFrom(mHurry, mHurryOrig);
       scaleFrom(mCompressorHead, mCompressorHeadOrig);
       scaleFrom(mCompressor, mCompressorOrig);
-      scaleFrom(mLife, mLifeOrig);
       scaleFrom(mFontImage, mFontImageOrig);
       mImagesReady = true;
     }
@@ -581,8 +579,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         mHurryOrig = null;
         mCompressorOrig.recycle();
         mCompressorOrig = null;
-        mLifeOrig.recycle();
-        mLifeOrig = null;
 
         if (imagesScaled) {
           mBackground.bmp.recycle();

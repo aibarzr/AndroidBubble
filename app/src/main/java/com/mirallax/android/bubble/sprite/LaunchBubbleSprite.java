@@ -57,11 +57,8 @@ public class LaunchBubbleSprite extends Sprite
 
   public final void paint(Canvas c, double scale, int dx, int dy)
   {
-    if (FrozenBubble.getMode() == FrozenBubble.GAME_NORMAL) {
-      drawImage(bubbles[currentColor], 302, 390, c, scale, dx, dy);
-    }
+    drawImage(bubbles[currentColor], 302, 390, c, scale, dx, dy);
 
-    // Draw the scaled and rotated launcher.
     c.save();
     int xCenter = 318;
     int yCenter = 406;

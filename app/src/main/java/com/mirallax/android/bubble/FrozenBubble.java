@@ -19,8 +19,6 @@ public class FrozenBubble extends Activity
   public final static int GAME_NORMAL = 0;
 
 
-  public final static int MENU_FULLSCREEN_ON = 3;
-  public final static int MENU_FULLSCREEN_OFF = 4;
   public final static int MENU_DONT_RUSH_ME = 7;
   public final static int MENU_RUSH_ME = 8;
   public final static int MENU_NEW_GAME = 9;
@@ -41,8 +39,6 @@ public class FrozenBubble extends Activity
   public boolean onCreateOptionsMenu(Menu menu)
   {
     super.onCreateOptionsMenu(menu);
-    menu.add(0, MENU_FULLSCREEN_ON, 0, R.string.menu_fullscreen_on);
-    menu.add(0, MENU_FULLSCREEN_OFF, 0, R.string.menu_fullscreen_off);
     menu.add(0, MENU_DONT_RUSH_ME, 0, R.string.menu_dont_rush_me);
     menu.add(0, MENU_RUSH_ME, 0, R.string.menu_rush_me);
     menu.add(0, MENU_NEW_GAME, 0, R.string.menu_new_game);
@@ -53,8 +49,6 @@ public class FrozenBubble extends Activity
   public boolean onPrepareOptionsMenu(Menu menu)
   {
     super.onPrepareOptionsMenu(menu);
-    menu.findItem(MENU_FULLSCREEN_ON).setVisible(!fullscreen);
-    menu.findItem(MENU_FULLSCREEN_OFF).setVisible(fullscreen);
     menu.findItem(MENU_DONT_RUSH_ME).setVisible(!getDontRushMe());
     menu.findItem(MENU_RUSH_ME).setVisible(getDontRushMe());
     return true;
@@ -66,14 +60,6 @@ public class FrozenBubble extends Activity
     switch (item.getItemId()) {
     case MENU_NEW_GAME:
       mGameThread.newGame();
-      return true;
-    case MENU_FULLSCREEN_ON:
-      fullscreen = true;
-      setFullscreen();
-      return true;
-    case MENU_FULLSCREEN_OFF:
-      fullscreen = false;
-      setFullscreen();
       return true;
     case MENU_DONT_RUSH_ME:
       setDontRushMe(true);
