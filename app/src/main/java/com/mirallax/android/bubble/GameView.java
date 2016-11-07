@@ -71,8 +71,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Bitmap mBackgroundOrig;
     private Bitmap[] mBubblesOrig;
-    private Bitmap[] mTargetedBubblesOrig;
-    private Bitmap mBubbleBlinkOrig;
     private Bitmap mHurryOrig;
     private Bitmap mCompressorHeadOrig;
     private BmpWrap mBackground;
@@ -81,8 +79,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private BmpWrap mCompressorHead;
     private BmpWrap mCompressor;
     private BmpWrap mLife;
-    private BmpWrap mFontImage;
-    // Launcher has to be a drawable, not a bitmap, because we rotate it.
     private Drawable mLauncher;
     private LevelManager mLevelManager;
 
@@ -106,14 +102,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public GameThread(SurfaceHolder surfaceHolder, byte[] customLevels,
                       int startingLevel)
     {
-      //Log.i("frozen-bubble", "GameThread()");
       mSurfaceHolder = surfaceHolder;
       Resources res = mContext.getResources();
       setState(STATE_PAUSE);
 
       BitmapFactory.Options options = new BitmapFactory.Options();
 
-      // The Options.inScaled field is only available starting at API 4.
       try {
         Field f = options.getClass().getField("inScaled");
         f.set(options, Boolean.FALSE);
@@ -138,21 +132,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                                      options);
       mBubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
                                                      options);
-      mTargetedBubblesOrig = new Bitmap[6];
-      mTargetedBubblesOrig[0] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_1, options);
-      mTargetedBubblesOrig[1] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_2, options);
-      mTargetedBubblesOrig[2] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_3, options);
-      mTargetedBubblesOrig[3] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_4, options);
-      mTargetedBubblesOrig[4] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_5, options);
-      mTargetedBubblesOrig[5] = BitmapFactory.decodeResource(
-          res, R.drawable.fixed_6, options);
-      mBubbleBlinkOrig =
-        BitmapFactory.decodeResource(res, R.drawable.bubble_blink, options);
       mHurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
       mCompressorHeadOrig =
         BitmapFactory.decodeResource(res, R.drawable.compressor, options);
@@ -167,7 +146,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       mCompressorHead = NewBmpWrap();
       mCompressor = NewBmpWrap();
       mLife = NewBmpWrap();
-      mFontImage = NewBmpWrap();
 
       mLauncher = res.getDrawable(R.drawable.launcher);
 
@@ -184,7 +162,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
           startingLevel = sp.getInt("level", 0);
           mLevelManager = new LevelManager(levels, startingLevel);
         } catch (IOException e) {
-          // Should never happen.
           throw new RuntimeException(e);
         }
       } else {
@@ -215,7 +192,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void resizeBitmaps()
     {
-      //Log.i("frozen-bubble", "resizeBitmaps()");
       scaleFrom(mBackground, mBackgroundOrig);
       for (int i = 0; i < mBubblesOrig.length; i++) {
         scaleFrom(mBubbles[i], mBubblesOrig[i]);
@@ -273,9 +249,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
           }
         } finally {
-          // do this in a finally so that if an exception is thrown
-          // during the above, we don't leave the Surface in an
-          // inconsistent state
           if (c != null) {
             mSurfaceHolder.unlockCanvasAndPost(c);
           }
@@ -283,12 +256,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       }
     }
 
-    /**
-     * Dump game state to the provided Bundle. Typically called when the
-     * Activity is being suspended.
-     *
-     * @return Bundle with this view's state
-     */
     public Bundle saveState(Bundle map) {
       synchronized (mSurfaceHolder) {
         if (map != null) {
@@ -357,7 +324,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if (mMode == STATE_RUNNING) {
-          //Log.i("frozen-bubble", "STATE RUNNING");
           if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
             mLeft = true;
             mWasLeft = true;
@@ -463,13 +429,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void doDraw(Canvas canvas)
     {
-      //Log.i("frozen-bubble", "doDraw()");
       if (!mImagesReady) {
-        //Log.i("frozen-bubble", "!mImagesReady, returning");
         return;
       }
       if (mDisplayDX > 0 || mDisplayDY > 0) {
-        //Log.i("frozen-bubble", "Drawing black background.");
         canvas.drawRGB(0, 0, 0);
       }
       drawBackground(canvas);
@@ -480,8 +443,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       if (mFrozenGame.play(mLeft || mWasLeft, mRight || mWasRight,
                            mFire || mUp || mWasFire || mWasUp || mTouchFire,
                            mTrackballDX, mTouchDX)) {
-        // Lost or won.  Need to start over.  The level is already
-        // incremented if this was a win.
         mFrozenGame = new FrozenGame(mBackground, mBubbles,
                                      mHurry, mCompressorHead,
                                      mCompressor, mLauncher,
@@ -498,12 +459,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void cleanUp() {
       synchronized (mSurfaceHolder) {
-        // I don't really understand why all this is necessary.
-        // I used to get a crash (an out-of-memory error) once every six or
-        // seven times I started the game.  I googled the error and someone
-        // said you have to call recycle() on all the bitmaps and set
-        // the pointers to null to facilitate garbage collection.  So I did
-        // and the crashes went away.
         mImagesReady = false;
         boolean imagesScaled = (mBackgroundOrig == mBackground.bmp);
         mBackgroundOrig.recycle();
@@ -513,13 +468,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
           mBubblesOrig[i] = null;
         }
         mBubblesOrig = null;
-        for (int i = 0; i < mTargetedBubblesOrig.length; i++) {
-          mTargetedBubblesOrig[i].recycle();
-          mTargetedBubblesOrig[i] = null;
-        }
-        mTargetedBubblesOrig = null;
-        mBubbleBlinkOrig.recycle();
-        mBubbleBlinkOrig = null;
         mHurryOrig.recycle();
         mHurryOrig = null;
 

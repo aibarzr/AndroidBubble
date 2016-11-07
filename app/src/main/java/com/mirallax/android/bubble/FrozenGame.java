@@ -81,7 +81,7 @@ public class FrozenGame extends GameScreen {
 
     launchBubblePosition = 20;
 
-    compressor = new Compressor(compressorHead_arg, compressor_arg);
+    compressor = new Compressor(compressorHead_arg);
 
     hurrySprite = new ImageSprite(new Rect(203, 265, 203 + 240, 265 + 90),
                                   hurry_arg);
@@ -117,10 +117,8 @@ public class FrozenGame extends GameScreen {
     currentColor = bubbleManager.nextBubbleIndex(random);
     nextColor = bubbleManager.nextBubbleIndex(random);
 
-    if (FrozenBubble.getMode() == FrozenBubble.GAME_NORMAL) {
       nextBubble = new ImageSprite(new Rect(302, 440, 302 + 32, 440 + 32),
                                    bubbles[nextColor]);
-    }
     this.addSprite(nextBubble);
 
     launchBubble = new LaunchBubbleSprite(currentColor, 
@@ -207,15 +205,13 @@ public class FrozenGame extends GameScreen {
       double realX = map.getDouble(String.format("%d-realX", i));
       double realY = map.getDouble(String.format("%d-realY", i));
       boolean fixed = map.getBoolean(String.format("%d-fixed", i));
-      boolean blink = map.getBoolean(String.format("%d-blink", i));
       boolean released = map.getBoolean(String.format("%d-released", i));
       boolean checkJump = map.getBoolean(String.format("%d-checkJump", i));
       boolean checkFall = map.getBoolean(String.format("%d-checkFall", i));
       int fixedAnim = map.getInt(String.format("%d-fixedAnim", i));
-      boolean frozen = map.getBoolean(String.format("%d-frozen", i));
       return new BubbleSprite(new Rect(left, top, right, bottom),
                               color, moveX, moveY, realX, realY,
-                              fixed, blink, released, checkJump, checkFall,
+                              fixed, released, checkJump, checkFall,
                               fixedAnim,
                               bubbles[color],
               bubbleManager, this);
@@ -348,18 +344,6 @@ public class FrozenGame extends GameScreen {
     compressor.moveDown();
   }
 
-  private void blinkLine(int number)
-  {
-    int move = number % 2;
-    int column = (number+1) >> 1;
-
-    for (int i=move ; i<13 ; i++) {
-      if (bubblePlay[column][i] != null) {
-        bubblePlay[column][i].blink();
-      }
-    }
-  }
-
   public boolean play(boolean key_left, boolean key_right, boolean key_fire,
                       double trackball_dx, double touch_dx)
   {
@@ -380,10 +364,6 @@ public class FrozenGame extends GameScreen {
 
     if (move[FIRE] == 0) {
       readyToFire = true;
-    }
-
-    if (FrozenBubble.getDontRushMe()) {
-      hurryTime = 1;
     }
 
     if (endOfGame) {
@@ -408,9 +388,7 @@ public class FrozenGame extends GameScreen {
           currentColor = nextColor;
           nextColor = bubbleManager.nextBubbleIndex(random);
 
-          if (FrozenBubble.getMode() == FrozenBubble.GAME_NORMAL) {
             nextBubble.changeImage(bubbles[nextColor]);
-          }
           launchBubble.changeColor(currentColor);
 
           readyToFire = false;
@@ -497,18 +475,12 @@ public class FrozenGame extends GameScreen {
     }
 
     if (fixedBubbles == 6) {
-      if (blinkDelay < 15) {
-        blinkLine(blinkDelay);
-      }
 
       blinkDelay++;
       if (blinkDelay == 40) {
         blinkDelay = 0;
       }
     } else if (fixedBubbles == 7) {
-      if (blinkDelay < 15) {
-        blinkLine(blinkDelay);
-      }
 
       blinkDelay++;
       if (blinkDelay == 25) {

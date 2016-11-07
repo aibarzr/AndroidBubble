@@ -17,13 +17,7 @@ public class FrozenBubble extends Activity
 
 
   public final static int MENU_NEW_GAME = 9;
-
-
   public final static String PREFS_NAME = "frozenbubble";
-
-  private static boolean dontRushMe = false;
-
-  private boolean fullscreen = true;
 
   private GameView.GameThread mGameThread;
   private GameView mGameView;
@@ -58,21 +52,10 @@ public class FrozenBubble extends Activity
 
   private void setFullscreen()
   {
-    if (fullscreen) {
       getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
       getWindow().clearFlags(
           WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-    } else {
-      getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-      getWindow().addFlags(
-          WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-    }
     mGameView.requestLayout();
-  }
-
-  public synchronized static boolean getDontRushMe()
-  {
-    return dontRushMe;
   }
 
   @Override
