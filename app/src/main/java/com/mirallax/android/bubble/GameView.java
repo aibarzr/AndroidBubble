@@ -77,13 +77,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private Bitmap mHurryOrig;
     private Bitmap mCompressorHeadOrig;
     private Bitmap mCompressorOrig;
-    private Bitmap mLifeOrig;
     private Bitmap mFontImageOrig;
     private BmpWrap mBackground;
     private BmpWrap[] mBubbles;
-    private BmpWrap[] mFrozenBubbles;
-    private BmpWrap[] mTargetedBubbles;
-    private BmpWrap mBubbleBlink;
     private BmpWrap mHurry;
     private BmpWrap mCompressorHead;
     private BmpWrap mCompressor;
@@ -192,15 +188,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       for (int i = 0; i < mBubbles.length; i++) {
         mBubbles[i] = NewBmpWrap();
       }
-      mFrozenBubbles = new BmpWrap[8];
-      for (int i = 0; i < mFrozenBubbles.length; i++) {
-        mFrozenBubbles[i] = NewBmpWrap();
-      }
-      mTargetedBubbles = new BmpWrap[6];
-      for (int i = 0; i < mTargetedBubbles.length; i++) {
-        mTargetedBubbles[i] = NewBmpWrap();
-      }
-      mBubbleBlink = NewBmpWrap();
       mHurry = NewBmpWrap();
       mCompressorHead = NewBmpWrap();
       mCompressor = NewBmpWrap();
@@ -231,7 +218,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       }
 
       mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                   mFrozenBubbles, mTargetedBubbles,
                                    mHurry,  mCompressorHead,
                                    mCompressor, mLauncher, 
                                    mLevelManager);
@@ -259,13 +245,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       for (int i = 0; i < mBubblesOrig.length; i++) {
         scaleFrom(mBubbles[i], mBubblesOrig[i]);
       }
-      for (int i = 0; i < mFrozenBubbles.length; i++) {
-        scaleFrom(mFrozenBubbles[i], mFrozenBubblesOrig[i]);
-      }
-      for (int i = 0; i < mTargetedBubbles.length; i++) {
-        scaleFrom(mTargetedBubbles[i], mTargetedBubblesOrig[i]);
-      }
-      scaleFrom(mBubbleBlink, mBubbleBlinkOrig);
       scaleFrom(mHurry, mHurryOrig);
       scaleFrom(mCompressorHead, mCompressorHeadOrig);
       scaleFrom(mCompressor, mCompressorOrig);
@@ -287,7 +266,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       synchronized (mSurfaceHolder) {
         mLevelManager.goToFirstLevel();
         mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                     mFrozenBubbles, mTargetedBubbles,
                                      mHurry,  mCompressorHead,
                                      mCompressor, mLauncher, 
                                      mLevelManager);
@@ -532,7 +510,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // Lost or won.  Need to start over.  The level is already
         // incremented if this was a win.
         mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                     mFrozenBubbles, mTargetedBubbles,
                                      mHurry, mCompressorHead,
                                      mCompressor, mLauncher,
                                      mLevelManager);
@@ -585,13 +562,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
           for (int i = 0; i < mBubbles.length; i++) {
             mBubbles[i].bmp.recycle();
           }
-          for (int i = 0; i < mFrozenBubbles.length; i++) {
-            mFrozenBubbles[i].bmp.recycle();
-          }
-          for (int i = 0; i < mTargetedBubbles.length; i++) {
-            mTargetedBubbles[i].bmp.recycle();
-          }
-          mBubbleBlink.bmp.recycle();
           mHurry.bmp.recycle();
           mCompressorHead.bmp.recycle();
           mCompressor.bmp.recycle();
@@ -604,18 +574,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
           mBubbles[i] = null;
         }
         mBubbles = null;
-        for (int i = 0; i < mFrozenBubbles.length; i++) {
-          mFrozenBubbles[i].bmp = null;
-          mFrozenBubbles[i] = null;
-        }
-        mFrozenBubbles = null;
-        for (int i = 0; i < mTargetedBubbles.length; i++) {
-          mTargetedBubbles[i].bmp = null;
-          mTargetedBubbles[i] = null;
-        }
-        mTargetedBubbles = null;
-        mBubbleBlink.bmp = null;
-        mBubbleBlink = null;
         mHurry.bmp = null;
         mHurry = null;
         mCompressorHead.bmp = null;

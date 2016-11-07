@@ -29,8 +29,6 @@ public class FrozenGame extends GameScreen {
 
   BmpWrap background;
   BmpWrap[] bubbles;
-  BmpWrap[] frozenBubbles;
-  BmpWrap[] targetedBubbles;
   Random random;
 
   LaunchBubbleSprite launchBubble;
@@ -69,8 +67,6 @@ public class FrozenGame extends GameScreen {
 
   public FrozenGame(BmpWrap background_arg,
                     BmpWrap[] bubbles_arg,
-                    BmpWrap[] frozenBubbles_arg,
-                    BmpWrap[] targetedBubbles_arg,
                     BmpWrap hurry_arg,
                     BmpWrap compressorHead_arg,
                     BmpWrap compressor_arg,
@@ -81,8 +77,6 @@ public class FrozenGame extends GameScreen {
     launcher = launcher_arg;
     background = background_arg;
     bubbles = bubbles_arg;
-    frozenBubbles = frozenBubbles_arg;
-    targetedBubbles = targetedBubbles_arg;
     levelManager = levelManager_arg;
 
     launchBubblePosition = 20;
@@ -112,7 +106,7 @@ public class FrozenGame extends GameScreen {
                new Rect(190+i*32-(j%2)*16, 44+j*28, 32, 32),
                currentLevel[i][j],
                bubbles[currentLevel[i][j]],
-               frozenBubbles[currentLevel[i][j]], bubbleManager,
+               bubbleManager,
                 this);
           bubblePlay[i][j] = newOne;
           this.addSprite(newOne);
@@ -223,9 +217,7 @@ public class FrozenGame extends GameScreen {
                               color, moveX, moveY, realX, realY,
                               fixed, blink, released, checkJump, checkFall,
                               fixedAnim,
-                              (frozen ? frozenBubbles[color] : bubbles[color]),
-                              frozenBubbles[color],
-                              targetedBubbles,
+                              bubbles[color],
               bubbleManager, this);
     } else if (type == Sprite.TYPE_IMAGE) {
       int imageId = map.getInt(String.format("%d-imageId", i));
@@ -298,54 +290,6 @@ public class FrozenGame extends GameScreen {
     frozenifyY = map.getInt("frozenifyY");
   }
 
-  private void initFrozenify()
-  {
-    ImageSprite freezeLaunchBubble =
-        new ImageSprite(new Rect(301, 389, 34, 42),
-                        frozenBubbles[currentColor]);
-    ImageSprite freezeNextBubble =
-        new ImageSprite(new Rect(301, 439, 34, 42), frozenBubbles[nextColor]);
-
-    this.addSprite(freezeLaunchBubble);
-    this.addSprite(freezeNextBubble);
-
-    frozenifyX = 7;
-    frozenifyY = 12;
-
-    frozenify = true;
-  }
-
-  private void frozenify()
-  {
-    frozenifyX--;
-    if (frozenifyX < 0) {
-      frozenifyX = 7;
-      frozenifyY--;
-
-      if (frozenifyY<0) {
-        frozenify = false;
-        return;
-      }
-    }
-
-    while (bubblePlay[frozenifyX][frozenifyY] == null && frozenifyY >=0) {
-      frozenifyX--;
-      if (frozenifyX < 0) {
-        frozenifyX = 7;
-        frozenifyY--;
-
-        if (frozenifyY<0) {
-          frozenify = false;
-          return;
-        }
-      }
-    }
-
-    this.spriteToBack(bubblePlay[frozenifyX][frozenifyY]);
-    bubblePlay[frozenifyX][frozenifyY].frozenify();
-
-    this.spriteToBack(launchBubble);
-  }
 
   public BubbleSprite[][] getGrid()
   {
@@ -395,7 +339,6 @@ public class FrozenGame extends GameScreen {
 
           if (bubblePlay[i][j].getSpritePosition().y>=380) {
             endOfGame = true;
-            initFrozenify();
           }
         }
       }
@@ -449,11 +392,6 @@ public class FrozenGame extends GameScreen {
           levelManager.goToNextLevel();
         }
         return true;
-      } else {
-
-        if (frozenify) {
-          frozenify();
-        }
       }
     } else {
       if (move[FIRE] == KEY_UP || hurryTime > 480) {
@@ -464,8 +402,6 @@ public class FrozenGame extends GameScreen {
                                           (int)launchBubblePosition,
                                           currentColor,
                                           bubbles[currentColor],
-                                          frozenBubbles[currentColor],
-                                          targetedBubbles,
                   bubbleManager, this);
           this.addSprite(movingBubble);
 
@@ -508,8 +444,6 @@ public class FrozenGame extends GameScreen {
         if (movingBubble.getSpritePosition().y>=380 &&
             !movingBubble.released()) {
           endOfGame = true;
-          initFrozenify();
-
         } else if (bubbleManager.countBubbles() == 0) {
           levelCompleted = true;
           endOfGame = true;
@@ -531,8 +465,6 @@ public class FrozenGame extends GameScreen {
           if (movingBubble.getSpritePosition().y>=380 &&
               !movingBubble.released()) {
             endOfGame = true;
-            initFrozenify();
-
           } else if (bubbleManager.countBubbles() == 0) {
             endOfGame = true;
             levelCompleted = true;

@@ -18,8 +18,6 @@ public class BubbleSprite extends Sprite
 
   private int color;
   private BmpWrap bubbleFace;
-  private BmpWrap frozenFace;
-  private BmpWrap[] bubbleFixed;
   private FrozenGame frozen;
   private BubbleManager bubbleManager;
   private double moveX, moveY;
@@ -51,8 +49,6 @@ public class BubbleSprite extends Sprite
     map.putBoolean(String.format("%d-checkJump", getSavedId()), checkJump);
     map.putBoolean(String.format("%d-checkFall", getSavedId()), checkFall);
     map.putInt(String.format("%d-fixedAnim", getSavedId()), fixedAnim);
-    map.putBoolean(String.format("%d-frozen", getSavedId()),
-                   bubbleFace == frozenFace ? true : false);
   }
 
   public int getTypeId()
@@ -64,8 +60,6 @@ public class BubbleSprite extends Sprite
                       double realX, double realY, boolean fixed, boolean blink,
                       boolean released, boolean checkJump, boolean checkFall,
                       int fixedAnim, BmpWrap bubbleFace,
-                      BmpWrap frozenFace,
-                      BmpWrap[] bubbleFixed,
                       BubbleManager bubbleManager,
                       FrozenGame frozen)
   {
@@ -82,15 +76,11 @@ public class BubbleSprite extends Sprite
     this.checkFall = checkFall;
     this.fixedAnim = fixedAnim;
     this.bubbleFace = bubbleFace;
-    this.frozenFace = frozenFace;
-    this.bubbleFixed = bubbleFixed;
     this.bubbleManager = bubbleManager;
     this.frozen = frozen;
   }
 
   public BubbleSprite(Rect area, int direction, int color, BmpWrap bubbleFace,
-                      BmpWrap frozenFace,
-                      BmpWrap[] bubbleFixed,
                       BubbleManager bubbleManager,
                       FrozenGame frozen)
   {
@@ -98,8 +88,6 @@ public class BubbleSprite extends Sprite
 
     this.color = color;
     this.bubbleFace = bubbleFace;
-    this.frozenFace = frozenFace;
-    this.bubbleFixed = bubbleFixed;
     this.bubbleManager = bubbleManager;
     this.frozen = frozen;
 
@@ -113,7 +101,6 @@ public class BubbleSprite extends Sprite
   }
 
   public BubbleSprite(Rect area, int color, BmpWrap bubbleFace,
-                      BmpWrap frozenFace,
                       BubbleManager bubbleManager,
                       FrozenGame frozen)
   {
@@ -121,7 +108,6 @@ public class BubbleSprite extends Sprite
 
     this.color = color;
     this.bubbleFace = bubbleFace;
-    this.frozenFace = frozenFace;
     this.bubbleManager = bubbleManager;
     this.frozen = frozen;
 
@@ -429,12 +415,6 @@ public class BubbleSprite extends Sprite
     blink = true;
   }
 
-  public void frozenify()
-  {
-    changeSpriteArea(new Rect(getSpritePosition().x-1, getSpritePosition().y-1,
-                              34, 42));
-    bubbleFace = frozenFace;
-  }
 
   public final void paint(Canvas c, double scale, int dx, int dy)
   {
@@ -446,7 +426,6 @@ public class BubbleSprite extends Sprite
         drawImage(bubbleFace, p.x, p.y, c, scale, dx, dy);
 
     if (fixedAnim != -1) {
-      drawImage(bubbleFixed[fixedAnim], p.x, p.y, c, scale, dx, dy);
       fixedAnim++;
       if (fixedAnim == 6) {
         fixedAnim = -1;
