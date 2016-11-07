@@ -71,13 +71,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Bitmap mBackgroundOrig;
     private Bitmap[] mBubblesOrig;
-    private Bitmap[] mFrozenBubblesOrig;
     private Bitmap[] mTargetedBubblesOrig;
     private Bitmap mBubbleBlinkOrig;
     private Bitmap mHurryOrig;
     private Bitmap mCompressorHeadOrig;
-    private Bitmap mCompressorOrig;
-    private Bitmap mFontImageOrig;
     private BmpWrap mBackground;
     private BmpWrap[] mBubbles;
     private BmpWrap mHurry;
@@ -141,23 +138,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                                      options);
       mBubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
                                                      options);
-      mFrozenBubblesOrig = new Bitmap[8];
-      mFrozenBubblesOrig[0] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_1, options);
-      mFrozenBubblesOrig[1] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_2, options);
-      mFrozenBubblesOrig[2] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_3, options);
-      mFrozenBubblesOrig[3] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_4, options);
-      mFrozenBubblesOrig[4] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_5, options);
-      mFrozenBubblesOrig[5] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_6, options);
-      mFrozenBubblesOrig[6] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_7, options);
-      mFrozenBubblesOrig[7] = BitmapFactory.decodeResource(
-          res, R.drawable.frozen_8, options);
       mTargetedBubblesOrig = new Bitmap[6];
       mTargetedBubblesOrig[0] = BitmapFactory.decodeResource(
           res, R.drawable.fixed_1, options);
@@ -176,11 +156,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       mHurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
       mCompressorHeadOrig =
         BitmapFactory.decodeResource(res, R.drawable.compressor, options);
-      mCompressorOrig =
-        BitmapFactory.decodeResource(res, R.drawable.compressor_body, options);
-      mFontImageOrig =
-        BitmapFactory.decodeResource(res, R.drawable.bubble_font, options);
-
       mImageList = new Vector();
 
       mBackground = NewBmpWrap();
@@ -247,8 +222,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
       }
       scaleFrom(mHurry, mHurryOrig);
       scaleFrom(mCompressorHead, mCompressorHeadOrig);
-      scaleFrom(mCompressor, mCompressorOrig);
-      scaleFrom(mFontImage, mFontImageOrig);
       mImagesReady = true;
     }
 
@@ -540,11 +513,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
           mBubblesOrig[i] = null;
         }
         mBubblesOrig = null;
-        for (int i = 0; i < mFrozenBubblesOrig.length; i++) {
-          mFrozenBubblesOrig[i].recycle();
-          mFrozenBubblesOrig[i] = null;
-        }
-        mFrozenBubblesOrig = null;
         for (int i = 0; i < mTargetedBubblesOrig.length; i++) {
           mTargetedBubblesOrig[i].recycle();
           mTargetedBubblesOrig[i] = null;
@@ -554,8 +522,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         mBubbleBlinkOrig = null;
         mHurryOrig.recycle();
         mHurryOrig = null;
-        mCompressorOrig.recycle();
-        mCompressorOrig = null;
 
         if (imagesScaled) {
           mBackground.bmp.recycle();
