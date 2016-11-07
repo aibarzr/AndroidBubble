@@ -9,69 +9,60 @@ import android.os.Bundle;
 
 import java.util.Vector;
 
-public abstract class Sprite
-{
-  public static int TYPE_BUBBLE = 1;
-  public static int TYPE_IMAGE = 2;
+public abstract class Sprite {
+    public static int TYPE_BUBBLE = 1;
+    public static int TYPE_IMAGE = 2;
 
-  private Rect spriteArea;
-  private int saved_id;
+    private Rect spriteArea;
+    private int saved_id;
 
-  public Sprite(Rect spriteArea)
-  {
-    this.spriteArea = spriteArea;
-    saved_id = -1;
-  }
-
-  public void saveState(Bundle map, Vector saved_sprites)
-  {
-    if (saved_id != -1) {
-      return;
+    public Sprite(Rect spriteArea) {
+        this.spriteArea = spriteArea;
+        saved_id = -1;
     }
-    saved_id = saved_sprites.size();
-    saved_sprites.addElement(this);
-    map.putInt(String.format("%d-left", saved_id), spriteArea.left);
-    map.putInt(String.format("%d-right", saved_id), spriteArea.right);
-    map.putInt(String.format("%d-top", saved_id), spriteArea.top);
-    map.putInt(String.format("%d-bottom", saved_id), spriteArea.bottom);
-    map.putInt(String.format("%d-type", saved_id), getTypeId());
-  }
 
-  public final int getSavedId()
-  {
-    return saved_id;
-  }
+    public void saveState(Bundle map, Vector saved_sprites) {
+        if (saved_id != -1) {
+            return;
+        }
+        saved_id = saved_sprites.size();
+        saved_sprites.addElement(this);
+        map.putInt(String.format("%d-left", saved_id), spriteArea.left);
+        map.putInt(String.format("%d-right", saved_id), spriteArea.right);
+        map.putInt(String.format("%d-top", saved_id), spriteArea.top);
+        map.putInt(String.format("%d-bottom", saved_id), spriteArea.bottom);
+        map.putInt(String.format("%d-type", saved_id), getTypeId());
+    }
 
-  public final void clearSavedId()
-  {
-    saved_id = -1;
-  }
+    public final int getSavedId() {
+        return saved_id;
+    }
 
-  public abstract int getTypeId();
+    public final void clearSavedId() {
+        saved_id = -1;
+    }
 
-  public final void absoluteMove(Point p)
-  {
-    spriteArea = new Rect(spriteArea);
-    spriteArea.offsetTo(p.x, p.y);
-  }
+    public abstract int getTypeId();
 
-  public final Point getSpritePosition()
-  {
-    return new Point(spriteArea.left, spriteArea.top);
-  }
+    public final void absoluteMove(Point p) {
+        spriteArea = new Rect(spriteArea);
+        spriteArea.offsetTo(p.x, p.y);
+    }
 
-  public final Rect getSpriteArea()
-  {
-    return spriteArea;
-  }
+    public final Point getSpritePosition() {
+        return new Point(spriteArea.left, spriteArea.top);
+    }
 
-  public static void drawImage(BmpWrap image, int x, int y,
-                               Canvas c, double scale, int dx, int dy)
-  {
-    c.drawBitmap(image.bmp, (float)(x * scale + dx), (float)(y * scale + dy),
-                 null);
-  }
+    public final Rect getSpriteArea() {
+        return spriteArea;
+    }
+
+    public static void drawImage(BmpWrap image, int x, int y,
+                                 Canvas c, double scale, int dx, int dy) {
+        c.drawBitmap(image.bmp, (float) (x * scale + dx), (float) (y * scale + dy),
+                null);
+    }
 
 
-  public abstract void paint(Canvas c, double scale, int dx, int dy);
+    public abstract void paint(Canvas c, double scale, int dx, int dy);
 }

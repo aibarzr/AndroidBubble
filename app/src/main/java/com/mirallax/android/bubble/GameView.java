@@ -3,6 +3,7 @@ package com.mirallax.android.bubble;
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.SharedPreferences;
@@ -27,564 +28,536 @@ import java.util.Vector;
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
-  class GameThread extends Thread {
-    private static final int FRAME_DELAY = 40;
+    class GameThread extends Thread {
+        private static final int FRAME_DELAY = 40;
 
-    public static final int STATE_RUNNING = 1;
-    public static final int STATE_PAUSE = 2;
+        public static final int STATE_RUNNING = 1;
+        public static final int STATE_PAUSE = 2;
 
-    public static final int GAMEFIELD_WIDTH = 320;
-    public static final int GAMEFIELD_HEIGHT = 480;
-    public static final int EXTENDED_GAMEFIELD_WIDTH = 640;
+        public static final int GAMEFIELD_WIDTH = 320;
+        public static final int GAMEFIELD_HEIGHT = 480;
+        public static final int EXTENDED_GAMEFIELD_WIDTH = 640;
 
-    private static final double TRACKBALL_COEFFICIENT = 5;
-    private static final double TOUCH_COEFFICIENT = 0.2;
-    private static final double TOUCH_FIRE_Y_THRESHOLD = 350;
+        private static final double TRACKBALL_COEFFICIENT = 5;
+        private static final double TOUCH_COEFFICIENT = 0.2;
+        private static final double TOUCH_FIRE_Y_THRESHOLD = 350;
 
-    private long mLastTime;
-    private int mMode;
-    private boolean mRun = false;
+        private long mLastTime;
+        private int mMode;
+        private boolean mRun = false;
 
-    private boolean mLeft = false;
-    private boolean mRight = false;
-    private boolean mUp = false;
-    private boolean mFire = false;
-    private boolean mWasLeft = false;
-    private boolean mWasRight = false;
-    private boolean mWasFire = false;
-    private boolean mWasUp = false;
-    private double mTrackballDX = 0;
-    private double mTouchDX = 0;
-    private double mTouchLastX;
-    private boolean mTouchFire = false;
+        private boolean mLeft = false;
+        private boolean mRight = false;
+        private boolean mUp = false;
+        private boolean mFire = false;
+        private boolean mWasLeft = false;
+        private boolean mWasRight = false;
+        private boolean mWasFire = false;
+        private boolean mWasUp = false;
+        private double mTrackballDX = 0;
+        private double mTouchDX = 0;
+        private double mTouchLastX;
+        private boolean mTouchFire = false;
 
-    private SurfaceHolder mSurfaceHolder;
-    private boolean mSurfaceOK = false;
+        private SurfaceHolder mSurfaceHolder;
+        private boolean mSurfaceOK = false;
 
-    private double mDisplayScale;
-    private int mDisplayDX;
-    private int mDisplayDY;
+        private double mDisplayScale;
+        private int mDisplayDX;
+        private int mDisplayDY;
 
-    private FrozenGame mFrozenGame;
+        private FrozenGame mFrozenGame;
 
-    private boolean mImagesReady = false;
+        private boolean mImagesReady = false;
 
-    private Bitmap mBackgroundOrig;
-    private Bitmap[] mBubblesOrig;
-    private Bitmap mHurryOrig;
-    private Bitmap mCompressorHeadOrig;
-    private BmpWrap mBackground;
-    private BmpWrap[] mBubbles;
-    private BmpWrap mHurry;
-    private BmpWrap mCompressorHead;
-    private BmpWrap mCompressor;
-    private BmpWrap mLife;
-    private Drawable mLauncher;
-    private LevelManager mLevelManager;
+        private Bitmap mBackgroundOrig;
+        private Bitmap[] mBubblesOrig;
+        private Bitmap mHurryOrig;
+        private Bitmap mCompressorHeadOrig;
+        private BmpWrap mBackground;
+        private BmpWrap[] mBubbles;
+        private BmpWrap mHurry;
+        private BmpWrap mCompressorHead;
+        private Drawable mLauncher;
+        private LevelManager mLevelManager;
 
-    Vector mImageList;
+        Vector mImageList;
 
-    public int getCurrentLevelIndex()
-    {
-      synchronized (mSurfaceHolder) {
-        return mLevelManager.getLevelIndex();
-      }
-    }
-
-    private BmpWrap NewBmpWrap()
-    {
-      int new_img_id = mImageList.size();
-      BmpWrap new_img = new BmpWrap(new_img_id);
-      mImageList.addElement(new_img);
-      return new_img;
-    }
-
-    public GameThread(SurfaceHolder surfaceHolder, byte[] customLevels,
-                      int startingLevel)
-    {
-      mSurfaceHolder = surfaceHolder;
-      Resources res = mContext.getResources();
-      setState(STATE_PAUSE);
-
-      BitmapFactory.Options options = new BitmapFactory.Options();
-
-      try {
-        Field f = options.getClass().getField("inScaled");
-        f.set(options, Boolean.FALSE);
-      } catch (Exception ignore) { }
-
-      mBackgroundOrig =
-        BitmapFactory.decodeResource(res, R.drawable.background, options);
-      mBubblesOrig = new Bitmap[8];
-      mBubblesOrig[0] = BitmapFactory.decodeResource(res, R.drawable.bubble_1,
-                                                     options);
-      mBubblesOrig[1] = BitmapFactory.decodeResource(res, R.drawable.bubble_2,
-                                                     options);
-      mBubblesOrig[2] = BitmapFactory.decodeResource(res, R.drawable.bubble_3,
-                                                     options);
-      mBubblesOrig[3] = BitmapFactory.decodeResource(res, R.drawable.bubble_4,
-                                                     options);
-      mBubblesOrig[4] = BitmapFactory.decodeResource(res, R.drawable.bubble_5,
-                                                     options);
-      mBubblesOrig[5] = BitmapFactory.decodeResource(res, R.drawable.bubble_6,
-                                                     options);
-      mBubblesOrig[6] = BitmapFactory.decodeResource(res, R.drawable.bubble_7,
-                                                     options);
-      mBubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
-                                                     options);
-      mHurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
-      mCompressorHeadOrig =
-        BitmapFactory.decodeResource(res, R.drawable.compressor, options);
-      mImageList = new Vector();
-
-      mBackground = NewBmpWrap();
-      mBubbles = new BmpWrap[8];
-      for (int i = 0; i < mBubbles.length; i++) {
-        mBubbles[i] = NewBmpWrap();
-      }
-      mHurry = NewBmpWrap();
-      mCompressorHead = NewBmpWrap();
-      mCompressor = NewBmpWrap();
-      mLife = NewBmpWrap();
-
-      mLauncher = res.getDrawable(R.drawable.launcher);
-
-
-      if (null == customLevels) {
-        try {
-          InputStream is = mContext.getAssets().open("levels.txt");
-          int size = is.available();
-          byte[] levels = new byte[size];
-          is.read(levels);
-          is.close();
-          SharedPreferences sp = mContext.getSharedPreferences(
-               FrozenBubble.PREFS_NAME, Context.MODE_PRIVATE);
-          startingLevel = sp.getInt("level", 0);
-          mLevelManager = new LevelManager(levels, startingLevel);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
+        public int getCurrentLevelIndex() {
+            synchronized (mSurfaceHolder) {
+                return mLevelManager.getLevelIndex();
+            }
         }
-      } else {
-        // We were launched by the level editor.
-        mLevelManager = new LevelManager(customLevels, startingLevel);
-      }
 
-      mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                   mHurry,  mCompressorHead,
-                                   mCompressor, mLauncher, 
-                                   mLevelManager);
-    }
-
-    private void scaleFrom(BmpWrap image, Bitmap bmp)
-    {
-      if (image.bmp != null && image.bmp != bmp) {
-        image.bmp.recycle();
-      }
-
-      if (mDisplayScale > 0.99999 && mDisplayScale < 1.00001) {
-        image.bmp = bmp;
-        return;
-      }
-      int dstWidth = (int)(bmp.getWidth() * mDisplayScale);
-      int dstHeight = (int)(bmp.getHeight() * mDisplayScale);
-      image.bmp = Bitmap.createScaledBitmap(bmp, dstWidth, dstHeight, true);
-    }
-
-    private void resizeBitmaps()
-    {
-      scaleFrom(mBackground, mBackgroundOrig);
-      for (int i = 0; i < mBubblesOrig.length; i++) {
-        scaleFrom(mBubbles[i], mBubblesOrig[i]);
-      }
-      scaleFrom(mHurry, mHurryOrig);
-      scaleFrom(mCompressorHead, mCompressorHeadOrig);
-      mImagesReady = true;
-    }
-
-    public void pause()
-    {
-      synchronized (mSurfaceHolder) {
-        if (mMode == STATE_RUNNING) {
-          setState(STATE_PAUSE);
+        private BmpWrap NewBmpWrap() {
+            int new_img_id = mImageList.size();
+            BmpWrap new_img = new BmpWrap(new_img_id);
+            mImageList.addElement(new_img);
+            return new_img;
         }
-      }
+
+        public GameThread(SurfaceHolder surfaceHolder, byte[] customLevels,
+                          int startingLevel) {
+            mSurfaceHolder = surfaceHolder;
+            Resources res = mContext.getResources();
+            setState(STATE_PAUSE);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+
+            try {
+                Field f = options.getClass().getField("inScaled");
+                f.set(options, Boolean.FALSE);
+            } catch (Exception ignore) {
+            }
+
+            mBackgroundOrig =
+                    BitmapFactory.decodeResource(res, R.drawable.background, options);
+            mBubblesOrig = new Bitmap[8];
+            mBubblesOrig[0] = BitmapFactory.decodeResource(res, R.drawable.bubble_1,
+                    options);
+            mBubblesOrig[1] = BitmapFactory.decodeResource(res, R.drawable.bubble_2,
+                    options);
+            mBubblesOrig[2] = BitmapFactory.decodeResource(res, R.drawable.bubble_3,
+                    options);
+            mBubblesOrig[3] = BitmapFactory.decodeResource(res, R.drawable.bubble_4,
+                    options);
+            mBubblesOrig[4] = BitmapFactory.decodeResource(res, R.drawable.bubble_5,
+                    options);
+            mBubblesOrig[5] = BitmapFactory.decodeResource(res, R.drawable.bubble_6,
+                    options);
+            mBubblesOrig[6] = BitmapFactory.decodeResource(res, R.drawable.bubble_7,
+                    options);
+            mBubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
+                    options);
+            mHurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
+            mCompressorHeadOrig =
+                    BitmapFactory.decodeResource(res, R.drawable.compressor, options);
+            mImageList = new Vector();
+
+            mBackground = NewBmpWrap();
+            mBubbles = new BmpWrap[8];
+            for (int i = 0; i < mBubbles.length; i++) {
+                mBubbles[i] = NewBmpWrap();
+            }
+            mHurry = NewBmpWrap();
+            mCompressorHead = NewBmpWrap();
+
+            mLauncher = res.getDrawable(R.drawable.launcher);
+
+
+            if (null == customLevels) {
+                try {
+                    InputStream is = mContext.getAssets().open("levels.txt");
+                    int size = is.available();
+                    byte[] levels = new byte[size];
+                    is.read(levels);
+                    is.close();
+                    SharedPreferences sp = mContext.getSharedPreferences(
+                            FrozenBubble.PREFS_NAME, Context.MODE_PRIVATE);
+                    startingLevel = sp.getInt("level", 0);
+                    mLevelManager = new LevelManager(levels, startingLevel);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // We were launched by the level editor.
+                mLevelManager = new LevelManager(customLevels, startingLevel);
+            }
+
+            mFrozenGame = new FrozenGame(mBackground, mBubbles,
+                    mHurry, mCompressorHead,
+                    mLauncher,
+                    mLevelManager);
+        }
+
+        private void scaleFrom(BmpWrap image, Bitmap bmp) {
+            if (image.bmp != null && image.bmp != bmp) {
+                image.bmp.recycle();
+            }
+
+            if (mDisplayScale > 0.99999 && mDisplayScale < 1.00001) {
+                image.bmp = bmp;
+                return;
+            }
+            int dstWidth = (int) (bmp.getWidth() * mDisplayScale);
+            int dstHeight = (int) (bmp.getHeight() * mDisplayScale);
+            image.bmp = Bitmap.createScaledBitmap(bmp, dstWidth, dstHeight, true);
+        }
+
+        private void resizeBitmaps() {
+            scaleFrom(mBackground, mBackgroundOrig);
+            for (int i = 0; i < mBubblesOrig.length; i++) {
+                scaleFrom(mBubbles[i], mBubblesOrig[i]);
+            }
+            scaleFrom(mHurry, mHurryOrig);
+            scaleFrom(mCompressorHead, mCompressorHeadOrig);
+            mImagesReady = true;
+        }
+
+        public void pause() {
+            synchronized (mSurfaceHolder) {
+                if (mMode == STATE_RUNNING) {
+                    setState(STATE_PAUSE);
+                }
+            }
+        }
+
+        public void newGame() {
+            synchronized (mSurfaceHolder) {
+                mLevelManager.goToFirstLevel();
+                mFrozenGame = new FrozenGame(mBackground, mBubbles,
+                        mHurry, mCompressorHead,
+                        mLauncher,
+                        mLevelManager);
+            }
+        }
+
+        @Override
+        public void run() {
+            while (mRun) {
+                long now = System.currentTimeMillis();
+                long delay = FRAME_DELAY + mLastTime - now;
+                if (delay > 0) {
+                    try {
+                        sleep(delay);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                mLastTime = now;
+                Canvas c = null;
+                try {
+                    if (surfaceOK()) {
+                        c = mSurfaceHolder.lockCanvas(null);
+                        if (c != null) {
+                            synchronized (mSurfaceHolder) {
+                                if (mRun) {
+                                    if (mMode == STATE_RUNNING) {
+                                        updateGameState();
+                                    }
+                                    doDraw(c);
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    if (c != null) {
+                        mSurfaceHolder.unlockCanvasAndPost(c);
+                    }
+                }
+            }
+        }
+
+        public Bundle saveState(Bundle map) {
+            synchronized (mSurfaceHolder) {
+                if (map != null) {
+                    mFrozenGame.saveState(map);
+                    mLevelManager.saveState(map);
+                }
+            }
+            return map;
+        }
+
+        public synchronized void restoreState(Bundle map) {
+            synchronized (mSurfaceHolder) {
+                setState(STATE_PAUSE);
+                mFrozenGame.restoreState(map, mImageList);
+                mLevelManager.restoreState(map);
+            }
+        }
+
+        public void setRunning(boolean b) {
+            mRun = b;
+        }
+
+        public void setState(int mode) {
+            synchronized (mSurfaceHolder) {
+                mMode = mode;
+            }
+        }
+
+        public void setSurfaceOK(boolean ok) {
+            synchronized (mSurfaceHolder) {
+                mSurfaceOK = ok;
+            }
+        }
+
+        public boolean surfaceOK() {
+            synchronized (mSurfaceHolder) {
+                return mSurfaceOK;
+            }
+        }
+
+        public void setSurfaceSize(int width, int height) {
+            synchronized (mSurfaceHolder) {
+                if (width / height >= GAMEFIELD_WIDTH / GAMEFIELD_HEIGHT) {
+                    mDisplayScale = 1.0 * height / GAMEFIELD_HEIGHT;
+                    mDisplayDX =
+                            (int) ((width - mDisplayScale * EXTENDED_GAMEFIELD_WIDTH) / 2);
+                    mDisplayDY = 0;
+                } else {
+                    mDisplayScale = 1.0 * width / GAMEFIELD_WIDTH;
+                    mDisplayDX = (int) (-mDisplayScale *
+                            (EXTENDED_GAMEFIELD_WIDTH - GAMEFIELD_WIDTH) / 2);
+                    mDisplayDY = (int) ((height - mDisplayScale * GAMEFIELD_HEIGHT) / 2);
+                }
+                resizeBitmaps();
+            }
+        }
+
+        boolean doKeyDown(int keyCode, KeyEvent msg) {
+            synchronized (mSurfaceHolder) {
+                if (mMode != STATE_RUNNING) {
+                    setState(STATE_RUNNING);
+                }
+
+                if (mMode == STATE_RUNNING) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+                        mLeft = true;
+                        mWasLeft = true;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                        mRight = true;
+                        mWasRight = true;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                        mFire = true;
+                        mWasFire = true;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                        mUp = true;
+                        mWasUp = true;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        boolean doKeyUp(int keyCode, KeyEvent msg) {
+            synchronized (mSurfaceHolder) {
+                if (mMode == STATE_RUNNING) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+                        mLeft = false;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                        mRight = false;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                        mFire = false;
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                        mUp = false;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        boolean doTrackballEvent(MotionEvent event) {
+            synchronized (mSurfaceHolder) {
+                if (mMode != STATE_RUNNING) {
+                    setState(STATE_RUNNING);
+                }
+
+                if (mMode == STATE_RUNNING) {
+                    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        mTrackballDX += event.getX() * TRACKBALL_COEFFICIENT;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        private double xFromScr(float x) {
+            return (x - mDisplayDX) / mDisplayScale;
+        }
+
+        private double yFromScr(float y) {
+            return (y - mDisplayDY) / mDisplayScale;
+        }
+
+        boolean doTouchEvent(MotionEvent event) {
+            synchronized (mSurfaceHolder) {
+                if (mMode != STATE_RUNNING) {
+                    setState(STATE_RUNNING);
+                }
+
+                double x = xFromScr(event.getX());
+                double y = yFromScr(event.getY());
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (y < TOUCH_FIRE_Y_THRESHOLD) {
+                        mTouchFire = true;
+                    }
+                    mTouchLastX = x;
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    if (y >= TOUCH_FIRE_Y_THRESHOLD) {
+                        mTouchDX = (x - mTouchLastX) * TOUCH_COEFFICIENT;
+                    }
+                    mTouchLastX = x;
+                }
+                return true;
+            }
+        }
+
+        private void drawBackground(Canvas c) {
+            Sprite.drawImage(mBackground, 0, 0, c, mDisplayScale,
+                    mDisplayDX, mDisplayDY);
+        }
+
+
+        private void doDraw(Canvas canvas) {
+            if (!mImagesReady) {
+                return;
+            }
+            if (mDisplayDX > 0 || mDisplayDY > 0) {
+                canvas.drawRGB(0, 0, 0);
+            }
+            drawBackground(canvas);
+            mFrozenGame.paint(canvas, mDisplayScale, mDisplayDX, mDisplayDY);
+        }
+
+        private void updateGameState() {
+            if (mFrozenGame.play(mLeft || mWasLeft, mRight || mWasRight,
+                    mFire || mUp || mWasFire || mWasUp || mTouchFire,
+                    mTrackballDX, mTouchDX)) {
+                mFrozenGame = new FrozenGame(mBackground, mBubbles,
+                        mHurry, mCompressorHead,
+                        mLauncher,
+                        mLevelManager);
+            }
+            mWasLeft = false;
+            mWasRight = false;
+            mWasFire = false;
+            mWasUp = false;
+            mTrackballDX = 0;
+            mTouchFire = false;
+            mTouchDX = 0;
+        }
+
+        public void cleanUp() {
+            synchronized (mSurfaceHolder) {
+                mImagesReady = false;
+                boolean imagesScaled = (mBackgroundOrig == mBackground.bmp);
+                mBackgroundOrig.recycle();
+                mBackgroundOrig = null;
+                for (int i = 0; i < mBubblesOrig.length; i++) {
+                    mBubblesOrig[i].recycle();
+                    mBubblesOrig[i] = null;
+                }
+                mBubblesOrig = null;
+                mHurryOrig.recycle();
+                mHurryOrig = null;
+
+                if (imagesScaled) {
+                    mBackground.bmp.recycle();
+                    for (int i = 0; i < mBubbles.length; i++) {
+                        mBubbles[i].bmp.recycle();
+                    }
+                    mHurry.bmp.recycle();
+                    mCompressorHead.bmp.recycle();
+                }
+                mBackground.bmp = null;
+                mBackground = null;
+                for (int i = 0; i < mBubbles.length; i++) {
+                    mBubbles[i].bmp = null;
+                    mBubbles[i] = null;
+                }
+                mBubbles = null;
+                mHurry.bmp = null;
+                mHurry = null;
+                mCompressorHead.bmp = null;
+                mCompressorHead = null;
+
+                mImageList = null;
+                mLevelManager = null;
+                mFrozenGame = null;
+            }
+        }
     }
 
-    public void newGame()
-    {
-      synchronized (mSurfaceHolder) {
-        mLevelManager.goToFirstLevel();
-        mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                     mHurry,  mCompressorHead,
-                                     mCompressor, mLauncher, 
-                                     mLevelManager);
-      }
+    private Context mContext;
+    private GameThread thread;
+
+    public GameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        mContext = context;
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+
+        thread = new GameThread(holder, null, 0);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+
+        thread.setRunning(true);
+        thread.start();
+    }
+
+    public GameView(Context context, byte[] levels, int startingLevel) {
+        super(context);
+
+        mContext = context;
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+
+        thread = new GameThread(holder, levels, startingLevel);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+
+        thread.setRunning(true);
+        thread.start();
+    }
+
+    public GameThread getThread() {
+        return thread;
     }
 
     @Override
-    public void run()
-    {
-      while (mRun) {
-        long now = System.currentTimeMillis();
-        long delay = FRAME_DELAY + mLastTime - now;
-        if (delay > 0) {
-          try{
-            sleep(delay);
-          } catch (InterruptedException e) {}
+    public boolean onKeyDown(int keyCode, KeyEvent msg) {
+        return thread.doKeyDown(keyCode, msg);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent msg) {
+        return thread.doKeyUp(keyCode, msg);
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent event) {
+        return thread.doTrackballEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return thread.doTouchEvent(event);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        //Log.i("frozen-bubble", "GameView.onWindowFocusChanged()");
+        if (!hasWindowFocus) {
+            thread.pause();
         }
-        mLastTime = now;
-        Canvas c = null;
-        try {
-          if (surfaceOK()) {
-            c = mSurfaceHolder.lockCanvas(null);
-            if (c != null) {
-              synchronized (mSurfaceHolder) {
-                if (mRun) {
-                    if (mMode == STATE_RUNNING) {
-                      updateGameState();
-                    }
-                    doDraw(c);
-                }
-              }
-            }
-          }
-        } finally {
-          if (c != null) {
-            mSurfaceHolder.unlockCanvasAndPost(c);
-          }
-        }
-      }
     }
 
-    public Bundle saveState(Bundle map) {
-      synchronized (mSurfaceHolder) {
-        if (map != null) {
-          mFrozenGame.saveState(map);
-          mLevelManager.saveState(map);
-        }
-      }
-      return map;
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
+        thread.setSurfaceSize(width, height);
     }
 
-    public synchronized void restoreState(Bundle map) {
-      synchronized (mSurfaceHolder) {
-        setState(STATE_PAUSE);
-        mFrozenGame.restoreState(map, mImageList);
-        mLevelManager.restoreState(map);
-      }
+    public void surfaceCreated(SurfaceHolder holder) {
+        thread.setSurfaceOK(true);
     }
 
-    public void setRunning(boolean b) {
-      mRun = b;
-    }
-
-    public void setState(int mode) {
-      synchronized (mSurfaceHolder) {
-        mMode = mode;
-      }
-    }
-
-    public void setSurfaceOK(boolean ok)
-    {
-      synchronized (mSurfaceHolder) {
-        mSurfaceOK = ok;
-      }
-    }
-
-    public boolean surfaceOK()
-    {
-      synchronized (mSurfaceHolder) {
-        return mSurfaceOK;
-      }
-    }
-
-    public void setSurfaceSize(int width, int height)
-    {
-      synchronized (mSurfaceHolder) {
-        if (width / height >= GAMEFIELD_WIDTH / GAMEFIELD_HEIGHT) {
-          mDisplayScale = 1.0 * height / GAMEFIELD_HEIGHT;
-          mDisplayDX =
-              (int)((width - mDisplayScale * EXTENDED_GAMEFIELD_WIDTH) / 2);
-          mDisplayDY = 0;
-        } else {
-          mDisplayScale = 1.0 * width / GAMEFIELD_WIDTH;
-          mDisplayDX = (int)(-mDisplayScale *
-                             (EXTENDED_GAMEFIELD_WIDTH - GAMEFIELD_WIDTH) / 2);
-          mDisplayDY = (int)((height - mDisplayScale * GAMEFIELD_HEIGHT) / 2);
-        }
-        resizeBitmaps();
-      }
-    }
-
-    boolean doKeyDown(int keyCode, KeyEvent msg)
-    {
-      synchronized (mSurfaceHolder) {
-        if (mMode != STATE_RUNNING) {
-          setState(STATE_RUNNING);
-        }
-
-        if (mMode == STATE_RUNNING) {
-          if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-            mLeft = true;
-            mWasLeft = true;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-            mRight = true;
-            mWasRight = true;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            mFire = true;
-            mWasFire = true;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-            mUp = true;
-            mWasUp = true;
-            return true;
-          }
-        }
-
-        return false;
-      }
-    }
-
-    boolean doKeyUp(int keyCode, KeyEvent msg)
-    {
-      synchronized (mSurfaceHolder) {
-        if (mMode == STATE_RUNNING) {
-          if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-            mLeft = false;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-            mRight = false;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            mFire = false;
-            return true;
-          } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-            mUp = false;
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-
-    boolean doTrackballEvent(MotionEvent event)
-    {
-      synchronized (mSurfaceHolder) {
-        if (mMode != STATE_RUNNING) {
-          setState(STATE_RUNNING);
-        }
-
-        if (mMode == STATE_RUNNING) {
-          if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            mTrackballDX += event.getX() * TRACKBALL_COEFFICIENT;
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-
-    private double xFromScr(float x)
-    {
-      return (x - mDisplayDX) / mDisplayScale;
-    }
-
-    private double yFromScr(float y)
-    {
-      return (y - mDisplayDY) / mDisplayScale;
-    }
-
-    boolean doTouchEvent(MotionEvent event)
-    {
-      synchronized (mSurfaceHolder) {
-        if (mMode != STATE_RUNNING) {
-          setState(STATE_RUNNING);
-        }
-
-        double x = xFromScr(event.getX());
-        double y = yFromScr(event.getY());
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-          if (y < TOUCH_FIRE_Y_THRESHOLD) {
-            mTouchFire = true;
-          }
-          mTouchLastX = x;
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-          if (y >= TOUCH_FIRE_Y_THRESHOLD) {
-            mTouchDX = (x - mTouchLastX) * TOUCH_COEFFICIENT;
-          }
-          mTouchLastX = x;
-        }
-        return true;
-      }
-    }
-
-    private void drawBackground(Canvas c)
-    {
-      Sprite.drawImage(mBackground, 0, 0, c, mDisplayScale,
-              mDisplayDX, mDisplayDY);
-    }
-
-
-    private void doDraw(Canvas canvas)
-    {
-      if (!mImagesReady) {
-        return;
-      }
-      if (mDisplayDX > 0 || mDisplayDY > 0) {
-        canvas.drawRGB(0, 0, 0);
-      }
-      drawBackground(canvas);
-      mFrozenGame.paint(canvas, mDisplayScale, mDisplayDX, mDisplayDY);
-    }
-
-    private void updateGameState() {
-      if (mFrozenGame.play(mLeft || mWasLeft, mRight || mWasRight,
-                           mFire || mUp || mWasFire || mWasUp || mTouchFire,
-                           mTrackballDX, mTouchDX)) {
-        mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                                     mHurry, mCompressorHead,
-                                     mCompressor, mLauncher,
-                                     mLevelManager);
-      }
-      mWasLeft = false;
-      mWasRight = false;
-      mWasFire = false;
-      mWasUp = false;
-      mTrackballDX = 0;
-      mTouchFire = false;
-      mTouchDX = 0;
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        thread.setSurfaceOK(false);
     }
 
     public void cleanUp() {
-      synchronized (mSurfaceHolder) {
-        mImagesReady = false;
-        boolean imagesScaled = (mBackgroundOrig == mBackground.bmp);
-        mBackgroundOrig.recycle();
-        mBackgroundOrig = null;
-        for (int i = 0; i < mBubblesOrig.length; i++) {
-          mBubblesOrig[i].recycle();
-          mBubblesOrig[i] = null;
-        }
-        mBubblesOrig = null;
-        mHurryOrig.recycle();
-        mHurryOrig = null;
-
-        if (imagesScaled) {
-          mBackground.bmp.recycle();
-          for (int i = 0; i < mBubbles.length; i++) {
-            mBubbles[i].bmp.recycle();
-          }
-          mHurry.bmp.recycle();
-          mCompressorHead.bmp.recycle();
-          mCompressor.bmp.recycle();
-          mLife.bmp.recycle();
-        }
-        mBackground.bmp = null;
-        mBackground = null;
-        for (int i = 0; i < mBubbles.length; i++) {
-          mBubbles[i].bmp = null;
-          mBubbles[i] = null;
-        }
-        mBubbles = null;
-        mHurry.bmp = null;
-        mHurry = null;
-        mCompressorHead.bmp = null;
-        mCompressorHead = null;
-        mCompressor.bmp = null;
-        mCompressor = null;
-        mLife.bmp = null;
-        mLife = null;
-
-        mImageList = null;
-        mLevelManager = null;
-        mFrozenGame = null;
-      }
+        thread.cleanUp();
+        mContext = null;
     }
-  }
-
-  private Context mContext;
-  private GameThread thread;
-
-  public GameView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-
-    mContext = context;
-    SurfaceHolder holder = getHolder();
-    holder.addCallback(this);
-    
-    thread = new GameThread(holder, null, 0);
-    setFocusable(true);
-    setFocusableInTouchMode(true);
-
-    thread.setRunning(true);
-    thread.start();
-  }
-
-  public GameView(Context context, byte[] levels, int startingLevel)
-  {
-    super(context);
-
-    mContext = context;
-    SurfaceHolder holder = getHolder();
-    holder.addCallback(this);
-    
-    thread = new GameThread(holder, levels, startingLevel);
-    setFocusable(true);
-    setFocusableInTouchMode(true);
-
-    thread.setRunning(true);
-    thread.start();
-  }
-  
-  public GameThread getThread() {
-    return thread;
-  }
-
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent msg) {
-    return thread.doKeyDown(keyCode, msg);
-  }
-
-  @Override
-  public boolean onKeyUp(int keyCode, KeyEvent msg) {
-    return thread.doKeyUp(keyCode, msg);
-  }
-
-  @Override
-  public boolean onTrackballEvent(MotionEvent event) {
-    return thread.doTrackballEvent(event);
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return thread.doTouchEvent(event);
-  }
-
-  @Override
-  public void onWindowFocusChanged(boolean hasWindowFocus) {
-    //Log.i("frozen-bubble", "GameView.onWindowFocusChanged()");
-    if (!hasWindowFocus) {
-      thread.pause();
-    }
-  }
-
-  public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                             int height) {
-    thread.setSurfaceSize(width, height);
-  }
-
-  public void surfaceCreated(SurfaceHolder holder) {
-    thread.setSurfaceOK(true);
-  }
-
-  public void surfaceDestroyed(SurfaceHolder holder) {
-    thread.setSurfaceOK(false);
-  }
-
-  public void cleanUp() {
-    thread.cleanUp();
-    mContext = null;
-  }
 }

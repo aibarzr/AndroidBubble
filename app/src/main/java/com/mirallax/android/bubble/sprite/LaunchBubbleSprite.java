@@ -7,64 +7,58 @@ import android.os.Bundle;
 
 import java.util.Vector;
 
-public class LaunchBubbleSprite extends Sprite
-{
-  private int currentColor;
-  private int currentDirection;
-  private Drawable launcher;
-  private BmpWrap[] bubbles;
+public class LaunchBubbleSprite extends Sprite {
+    private int currentColor;
+    private int currentDirection;
+    private Drawable launcher;
+    private BmpWrap[] bubbles;
 
-  public LaunchBubbleSprite(int initialColor, int initialDirection,
-                            Drawable launcher,
-                            BmpWrap[] bubbles)
-  {
-    super(new Rect(276, 362, 276 + 86, 362 + 76));
+    public LaunchBubbleSprite(int initialColor, int initialDirection,
+                              Drawable launcher,
+                              BmpWrap[] bubbles) {
+        super(new Rect(276, 362, 276 + 86, 362 + 76));
 
-    currentColor = initialColor;
-    currentDirection = initialDirection;
-    this.launcher = launcher;
-    this.bubbles = bubbles;
-  }
-
-  public void saveState(Bundle map, Vector saved_sprites) {
-    if (getSavedId() != -1) {
-      return;
+        currentColor = initialColor;
+        currentDirection = initialDirection;
+        this.launcher = launcher;
+        this.bubbles = bubbles;
     }
-    super.saveState(map, saved_sprites);
-    map.putInt(String.format("%d-currentColor", getSavedId()), currentColor);
-    map.putInt(String.format("%d-currentDirection", getSavedId()),
-               currentDirection);
-  }
 
-  public int getTypeId()
-  {
-    return 9999;
-  }
+    public void saveState(Bundle map, Vector saved_sprites) {
+        if (getSavedId() != -1) {
+            return;
+        }
+        super.saveState(map, saved_sprites);
+        map.putInt(String.format("%d-currentColor", getSavedId()), currentColor);
+        map.putInt(String.format("%d-currentDirection", getSavedId()),
+                currentDirection);
+    }
 
-  public void changeColor(int newColor)
-  {
-    currentColor = newColor;
-  }
+    public int getTypeId() {
+        return 9999;
+    }
 
-  public void changeDirection(int newDirection)
-  {
-    currentDirection = newDirection;
-  }
+    public void changeColor(int newColor) {
+        currentColor = newColor;
+    }
 
-  public final void paint(Canvas c, double scale, int dx, int dy)
-  {
-    drawImage(bubbles[currentColor], 302, 390, c, scale, dx, dy);
+    public void changeDirection(int newDirection) {
+        currentDirection = newDirection;
+    }
 
-    c.save();
-    int xCenter = 318;
-    int yCenter = 406;
-    c.rotate((float)(0.025 * 180 * (currentDirection - 20)),
-             (float)(xCenter * scale + dx), (float)(yCenter * scale + dy));
-    launcher.setBounds((int)((xCenter - 50) * scale + dx),
-                       (int)((yCenter - 50) * scale + dy),
-                       (int)((xCenter + 50) * scale + dx),
-                       (int)((yCenter + 50) * scale + dy));
-    launcher.draw(c);
-    c.restore();
-  }
+    public final void paint(Canvas c, double scale, int dx, int dy) {
+        drawImage(bubbles[currentColor], 302, 390, c, scale, dx, dy);
+
+        c.save();
+        int xCenter = 318;
+        int yCenter = 406;
+        c.rotate((float) (0.025 * 180 * (currentDirection - 20)),
+                (float) (xCenter * scale + dx), (float) (yCenter * scale + dy));
+        launcher.setBounds((int) ((xCenter - 50) * scale + dx),
+                (int) ((yCenter - 50) * scale + dy),
+                (int) ((xCenter + 50) * scale + dx),
+                (int) ((yCenter + 50) * scale + dy));
+        launcher.draw(c);
+        c.restore();
+    }
 }
