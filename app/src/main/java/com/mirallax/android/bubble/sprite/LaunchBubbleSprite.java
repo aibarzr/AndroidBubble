@@ -5,17 +5,18 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class LaunchBubbleSprite extends Sprite {
     private int currentColor;
     private int currentDirection;
     private Drawable launcher;
-    private BmpWrap[] bubbles;
+    private ArrayList<BmpWrap> bubbles;
 
     public LaunchBubbleSprite(int initialColor, int initialDirection,
                               Drawable launcher,
-                              BmpWrap[] bubbles) {
+                              ArrayList bubbles) {
         super(new Rect(276, 362, 276 + 86, 362 + 76));
 
         currentColor = initialColor;
@@ -47,7 +48,7 @@ public class LaunchBubbleSprite extends Sprite {
     }
 
     public final void paint(Canvas c, double scale, int dx, int dy) {
-        drawImage(bubbles[currentColor], 302, 390, c, scale, dx, dy);
+        drawImage(bubbles.get(currentColor), 302, 390, c, scale, dx, dy);
 
         c.save();
         int xCenter = 318;

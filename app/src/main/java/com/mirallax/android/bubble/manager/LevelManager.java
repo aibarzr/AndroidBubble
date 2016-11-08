@@ -2,11 +2,12 @@ package com.mirallax.android.bubble.manager;
 
 import android.os.Bundle;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class LevelManager {
     private int currentLevel;
-    private Vector levelList;
+    private ArrayList levelList;
 
     public void saveState(Bundle map) {
         map.putInt("LevelManager-currentLevel", currentLevel);
@@ -20,7 +21,7 @@ public class LevelManager {
         String allLevels = new String(levels);
 
         currentLevel = startingLevel;
-        levelList = new Vector();
+        levelList = new ArrayList();
 
         int nextLevel = allLevels.indexOf("\n\n");
         if (nextLevel == -1 && allLevels.trim().length() != 0) {
@@ -30,7 +31,7 @@ public class LevelManager {
         while (nextLevel != -1) {
             String currentLevel = allLevels.substring(0, nextLevel).trim();
 
-            levelList.addElement(getLevel(currentLevel));
+            levelList.add(getLevel(currentLevel));
 
             allLevels = allLevels.substring(nextLevel).trim();
 
@@ -87,7 +88,7 @@ public class LevelManager {
 
     public byte[][] getCurrentLevel() {
         if (currentLevel < levelList.size()) {
-            return (byte[][]) levelList.elementAt(currentLevel);
+            return (byte[][]) levelList.get(currentLevel);
         }
 
         return null;

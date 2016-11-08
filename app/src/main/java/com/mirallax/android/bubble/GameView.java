@@ -23,6 +23,7 @@ import com.mirallax.android.bubble.manager.LevelManager;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 import com.mirallax.android.bubble.sprite.Sprite;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -42,63 +43,63 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         private static final double TOUCH_COEFFICIENT = 0.2;
         private static final double TOUCH_FIRE_Y_THRESHOLD = 350;
 
-        private long mLastTime;
-        private int mMode;
-        private boolean mRun = false;
+        private long lastTime;
+        private int mode;
+        private boolean run = false;
 
-        private boolean mLeft = false;
-        private boolean mRight = false;
-        private boolean mUp = false;
-        private boolean mFire = false;
-        private boolean mWasLeft = false;
-        private boolean mWasRight = false;
-        private boolean mWasFire = false;
-        private boolean mWasUp = false;
-        private double mTrackballDX = 0;
-        private double mTouchDX = 0;
-        private double mTouchLastX;
-        private boolean mTouchFire = false;
+        private boolean left = false;
+        private boolean right = false;
+        private boolean up = false;
+        private boolean fire = false;
+        private boolean wasLeft = false;
+        private boolean wasRight = false;
+        private boolean wasFire = false;
+        private boolean wasUp = false;
+        private double trackballDX = 0;
+        private double touchDX = 0;
+        private double touchLastX;
+        private boolean touchFire = false;
 
-        private SurfaceHolder mSurfaceHolder;
-        private boolean mSurfaceOK = false;
+        private SurfaceHolder surfaceHolder;
+        private boolean surfaceOK = false;
 
-        private double mDisplayScale;
-        private int mDisplayDX;
-        private int mDisplayDY;
+        private double displayScale;
+        private int displayDX;
+        private int displayDY;
 
-        private FrozenGame mFrozenGame;
+        private FrozenGame frozenGame;
 
-        private boolean mImagesReady = false;
+        private boolean imagesReady = false;
 
-        private Bitmap mBackgroundOrig;
-        private Bitmap[] mBubblesOrig;
-        private Bitmap mHurryOrig;
-        private Bitmap mCompressorHeadOrig;
-        private BmpWrap mBackground;
-        private BmpWrap[] mBubbles;
-        private BmpWrap mHurry;
-        private BmpWrap mCompressorHead;
-        private Drawable mLauncher;
-        private LevelManager mLevelManager;
+        private Bitmap backgroundOrig;
+        private Bitmap[] bubblesOrig;
+        private Bitmap hurryOrig;
+        private Bitmap compressorHeadOrig;
+        private BmpWrap background;
+        private ArrayList<BmpWrap> bubbles;
+        private BmpWrap hurry;
+        private BmpWrap compressorHead;
+        private Drawable launcher;
+        private LevelManager levelManager;
 
-        Vector mImageList;
+        Vector imageList;
 
         public int getCurrentLevelIndex() {
-            synchronized (mSurfaceHolder) {
-                return mLevelManager.getLevelIndex();
+            synchronized (surfaceHolder) {
+                return levelManager.getLevelIndex();
             }
         }
 
         private BmpWrap NewBmpWrap() {
-            int new_img_id = mImageList.size();
+            int new_img_id = imageList.size();
             BmpWrap new_img = new BmpWrap(new_img_id);
-            mImageList.addElement(new_img);
+            imageList.addElement(new_img);
             return new_img;
         }
 
         public GameThread(SurfaceHolder surfaceHolder, byte[] customLevels,
                           int startingLevel) {
-            mSurfaceHolder = surfaceHolder;
+            this.surfaceHolder = surfaceHolder;
             Resources res = mContext.getResources();
             setState(STATE_PAUSE);
 
@@ -110,39 +111,39 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             } catch (Exception ignore) {
             }
 
-            mBackgroundOrig =
+            backgroundOrig =
                     BitmapFactory.decodeResource(res, R.drawable.background, options);
-            mBubblesOrig = new Bitmap[8];
-            mBubblesOrig[0] = BitmapFactory.decodeResource(res, R.drawable.bubble_1,
+            bubblesOrig = new Bitmap[8];
+            bubblesOrig[0] = BitmapFactory.decodeResource(res, R.drawable.bubble_1,
                     options);
-            mBubblesOrig[1] = BitmapFactory.decodeResource(res, R.drawable.bubble_2,
+            bubblesOrig[1] = BitmapFactory.decodeResource(res, R.drawable.bubble_2,
                     options);
-            mBubblesOrig[2] = BitmapFactory.decodeResource(res, R.drawable.bubble_3,
+            bubblesOrig[2] = BitmapFactory.decodeResource(res, R.drawable.bubble_3,
                     options);
-            mBubblesOrig[3] = BitmapFactory.decodeResource(res, R.drawable.bubble_4,
+            bubblesOrig[3] = BitmapFactory.decodeResource(res, R.drawable.bubble_4,
                     options);
-            mBubblesOrig[4] = BitmapFactory.decodeResource(res, R.drawable.bubble_5,
+            bubblesOrig[4] = BitmapFactory.decodeResource(res, R.drawable.bubble_5,
                     options);
-            mBubblesOrig[5] = BitmapFactory.decodeResource(res, R.drawable.bubble_6,
+            bubblesOrig[5] = BitmapFactory.decodeResource(res, R.drawable.bubble_6,
                     options);
-            mBubblesOrig[6] = BitmapFactory.decodeResource(res, R.drawable.bubble_7,
+            bubblesOrig[6] = BitmapFactory.decodeResource(res, R.drawable.bubble_7,
                     options);
-            mBubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
+            bubblesOrig[7] = BitmapFactory.decodeResource(res, R.drawable.bubble_8,
                     options);
-            mHurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
-            mCompressorHeadOrig =
+            hurryOrig = BitmapFactory.decodeResource(res, R.drawable.hurry, options);
+            compressorHeadOrig =
                     BitmapFactory.decodeResource(res, R.drawable.compressor, options);
-            mImageList = new Vector();
+            imageList = new Vector();
 
-            mBackground = NewBmpWrap();
-            mBubbles = new BmpWrap[8];
-            for (int i = 0; i < mBubbles.length; i++) {
-                mBubbles[i] = NewBmpWrap();
+            background = NewBmpWrap();
+            bubbles = new ArrayList<>(8);
+            for (int i = 0; i < 8; i++) {
+                bubbles.add(NewBmpWrap());
             }
-            mHurry = NewBmpWrap();
-            mCompressorHead = NewBmpWrap();
+            hurry = NewBmpWrap();
+            compressorHead = NewBmpWrap();
 
-            mLauncher = res.getDrawable(R.drawable.launcher);
+            launcher = res.getDrawable(R.drawable.launcher);
 
 
             if (null == customLevels) {
@@ -155,19 +156,16 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     SharedPreferences sp = mContext.getSharedPreferences(
                             FrozenBubble.PREFS_NAME, Context.MODE_PRIVATE);
                     startingLevel = sp.getInt("level", 0);
-                    mLevelManager = new LevelManager(levels, startingLevel);
+                    levelManager = new LevelManager(levels, startingLevel);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            } else {
-                // We were launched by the level editor.
-                mLevelManager = new LevelManager(customLevels, startingLevel);
             }
 
-            mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                    mHurry, mCompressorHead,
-                    mLauncher,
-                    mLevelManager);
+            frozenGame = new FrozenGame(background, bubbles,
+                    hurry, compressorHead,
+                    launcher,
+                    levelManager);
         }
 
         private void scaleFrom(BmpWrap image, Bitmap bmp) {
@@ -175,63 +173,63 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 image.bmp.recycle();
             }
 
-            if (mDisplayScale > 0.99999 && mDisplayScale < 1.00001) {
+            if (displayScale > 0.99999 && displayScale < 1.00001) {
                 image.bmp = bmp;
                 return;
             }
-            int dstWidth = (int) (bmp.getWidth() * mDisplayScale);
-            int dstHeight = (int) (bmp.getHeight() * mDisplayScale);
+            int dstWidth = (int) (bmp.getWidth() * displayScale);
+            int dstHeight = (int) (bmp.getHeight() * displayScale);
             image.bmp = Bitmap.createScaledBitmap(bmp, dstWidth, dstHeight, true);
         }
 
         private void resizeBitmaps() {
-            scaleFrom(mBackground, mBackgroundOrig);
-            for (int i = 0; i < mBubblesOrig.length; i++) {
-                scaleFrom(mBubbles[i], mBubblesOrig[i]);
+            scaleFrom(background, backgroundOrig);
+            for (int i = 0; i < bubblesOrig.length; i++) {
+                scaleFrom(bubbles.get(i), bubblesOrig[i]);
             }
-            scaleFrom(mHurry, mHurryOrig);
-            scaleFrom(mCompressorHead, mCompressorHeadOrig);
-            mImagesReady = true;
+            scaleFrom(hurry, hurryOrig);
+            scaleFrom(compressorHead, compressorHeadOrig);
+            imagesReady = true;
         }
 
         public void pause() {
-            synchronized (mSurfaceHolder) {
-                if (mMode == STATE_RUNNING) {
+            synchronized (surfaceHolder) {
+                if (mode == STATE_RUNNING) {
                     setState(STATE_PAUSE);
                 }
             }
         }
 
         public void newGame() {
-            synchronized (mSurfaceHolder) {
-                mLevelManager.goToFirstLevel();
-                mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                        mHurry, mCompressorHead,
-                        mLauncher,
-                        mLevelManager);
+            synchronized (surfaceHolder) {
+                levelManager.goToFirstLevel();
+                frozenGame = new FrozenGame(background, bubbles,
+                        hurry, compressorHead,
+                        launcher,
+                        levelManager);
             }
         }
 
         @Override
         public void run() {
-            while (mRun) {
+            while (run) {
                 long now = System.currentTimeMillis();
-                long delay = FRAME_DELAY + mLastTime - now;
+                long delay = FRAME_DELAY + lastTime - now;
                 if (delay > 0) {
                     try {
                         sleep(delay);
                     } catch (InterruptedException e) {
                     }
                 }
-                mLastTime = now;
+                lastTime = now;
                 Canvas c = null;
                 try {
                     if (surfaceOK()) {
-                        c = mSurfaceHolder.lockCanvas(null);
+                        c = surfaceHolder.lockCanvas(null);
                         if (c != null) {
-                            synchronized (mSurfaceHolder) {
-                                if (mRun) {
-                                    if (mMode == STATE_RUNNING) {
+                            synchronized (surfaceHolder) {
+                                if (run) {
+                                    if (mode == STATE_RUNNING) {
                                         updateGameState();
                                     }
                                     doDraw(c);
@@ -241,91 +239,91 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 } finally {
                     if (c != null) {
-                        mSurfaceHolder.unlockCanvasAndPost(c);
+                        surfaceHolder.unlockCanvasAndPost(c);
                     }
                 }
             }
         }
 
         public Bundle saveState(Bundle map) {
-            synchronized (mSurfaceHolder) {
+            synchronized (surfaceHolder) {
                 if (map != null) {
-                    mFrozenGame.saveState(map);
-                    mLevelManager.saveState(map);
+                    frozenGame.saveState(map);
+                    levelManager.saveState(map);
                 }
             }
             return map;
         }
 
         public synchronized void restoreState(Bundle map) {
-            synchronized (mSurfaceHolder) {
+            synchronized (surfaceHolder) {
                 setState(STATE_PAUSE);
-                mFrozenGame.restoreState(map, mImageList);
-                mLevelManager.restoreState(map);
+                frozenGame.restoreState(map, imageList);
+                levelManager.restoreState(map);
             }
         }
 
         public void setRunning(boolean b) {
-            mRun = b;
+            run = b;
         }
 
         public void setState(int mode) {
-            synchronized (mSurfaceHolder) {
-                mMode = mode;
+            synchronized (surfaceHolder) {
+                this.mode = mode;
             }
         }
 
         public void setSurfaceOK(boolean ok) {
-            synchronized (mSurfaceHolder) {
-                mSurfaceOK = ok;
+            synchronized (surfaceHolder) {
+                surfaceOK = ok;
             }
         }
 
         public boolean surfaceOK() {
-            synchronized (mSurfaceHolder) {
-                return mSurfaceOK;
+            synchronized (surfaceHolder) {
+                return surfaceOK;
             }
         }
 
         public void setSurfaceSize(int width, int height) {
-            synchronized (mSurfaceHolder) {
+            synchronized (surfaceHolder) {
                 if (width / height >= GAMEFIELD_WIDTH / GAMEFIELD_HEIGHT) {
-                    mDisplayScale = 1.0 * height / GAMEFIELD_HEIGHT;
-                    mDisplayDX =
-                            (int) ((width - mDisplayScale * EXTENDED_GAMEFIELD_WIDTH) / 2);
-                    mDisplayDY = 0;
+                    displayScale = 1.0 * height / GAMEFIELD_HEIGHT;
+                    displayDX =
+                            (int) ((width - displayScale * EXTENDED_GAMEFIELD_WIDTH) / 2);
+                    displayDY = 0;
                 } else {
-                    mDisplayScale = 1.0 * width / GAMEFIELD_WIDTH;
-                    mDisplayDX = (int) (-mDisplayScale *
+                    displayScale = 1.0 * width / GAMEFIELD_WIDTH;
+                    displayDX = (int) (-displayScale *
                             (EXTENDED_GAMEFIELD_WIDTH - GAMEFIELD_WIDTH) / 2);
-                    mDisplayDY = (int) ((height - mDisplayScale * GAMEFIELD_HEIGHT) / 2);
+                    displayDY = (int) ((height - displayScale * GAMEFIELD_HEIGHT) / 2);
                 }
                 resizeBitmaps();
             }
         }
 
         boolean doKeyDown(int keyCode, KeyEvent msg) {
-            synchronized (mSurfaceHolder) {
-                if (mMode != STATE_RUNNING) {
+            synchronized (surfaceHolder) {
+                if (mode != STATE_RUNNING) {
                     setState(STATE_RUNNING);
                 }
 
-                if (mMode == STATE_RUNNING) {
+                if (mode == STATE_RUNNING) {
                     if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-                        mLeft = true;
-                        mWasLeft = true;
+                        left = true;
+                        wasLeft = true;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                        mRight = true;
-                        mWasRight = true;
+                        right = true;
+                        wasRight = true;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                        mFire = true;
-                        mWasFire = true;
+                        fire = true;
+                        wasFire = true;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-                        mUp = true;
-                        mWasUp = true;
+                        up = true;
+                        wasUp = true;
                         return true;
                     }
                 }
@@ -335,19 +333,19 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         boolean doKeyUp(int keyCode, KeyEvent msg) {
-            synchronized (mSurfaceHolder) {
-                if (mMode == STATE_RUNNING) {
+            synchronized (surfaceHolder) {
+                if (mode == STATE_RUNNING) {
                     if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-                        mLeft = false;
+                        left = false;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                        mRight = false;
+                        right = false;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                        mFire = false;
+                        fire = false;
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-                        mUp = false;
+                        up = false;
                         return true;
                     }
                 }
@@ -356,14 +354,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         boolean doTrackballEvent(MotionEvent event) {
-            synchronized (mSurfaceHolder) {
-                if (mMode != STATE_RUNNING) {
+            synchronized (surfaceHolder) {
+                if (mode != STATE_RUNNING) {
                     setState(STATE_RUNNING);
                 }
 
-                if (mMode == STATE_RUNNING) {
+                if (mode == STATE_RUNNING) {
                     if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                        mTrackballDX += event.getX() * TRACKBALL_COEFFICIENT;
+                        trackballDX += event.getX() * TRACKBALL_COEFFICIENT;
                         return true;
                     }
                 }
@@ -372,16 +370,16 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private double xFromScr(float x) {
-            return (x - mDisplayDX) / mDisplayScale;
+            return (x - displayDX) / displayScale;
         }
 
         private double yFromScr(float y) {
-            return (y - mDisplayDY) / mDisplayScale;
+            return (y - displayDY) / displayScale;
         }
 
         boolean doTouchEvent(MotionEvent event) {
-            synchronized (mSurfaceHolder) {
-                if (mMode != STATE_RUNNING) {
+            synchronized (surfaceHolder) {
+                if (mode != STATE_RUNNING) {
                     setState(STATE_RUNNING);
                 }
 
@@ -389,91 +387,87 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 double y = yFromScr(event.getY());
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     if (y < TOUCH_FIRE_Y_THRESHOLD) {
-                        mTouchFire = true;
+                        touchFire = true;
                     }
-                    mTouchLastX = x;
+                    touchLastX = x;
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                     if (y >= TOUCH_FIRE_Y_THRESHOLD) {
-                        mTouchDX = (x - mTouchLastX) * TOUCH_COEFFICIENT;
+                        touchDX = (x - touchLastX) * TOUCH_COEFFICIENT;
                     }
-                    mTouchLastX = x;
+                    touchLastX = x;
                 }
                 return true;
             }
         }
 
         private void drawBackground(Canvas c) {
-            Sprite.drawImage(mBackground, 0, 0, c, mDisplayScale,
-                    mDisplayDX, mDisplayDY);
+            Sprite.drawImage(background, 0, 0, c, displayScale,
+                    displayDX, displayDY);
         }
 
 
         private void doDraw(Canvas canvas) {
-            if (!mImagesReady) {
+            if (!imagesReady) {
                 return;
             }
-            if (mDisplayDX > 0 || mDisplayDY > 0) {
+            if (displayDX > 0 || displayDY > 0) {
                 canvas.drawRGB(0, 0, 0);
             }
             drawBackground(canvas);
-            mFrozenGame.paint(canvas, mDisplayScale, mDisplayDX, mDisplayDY);
+            frozenGame.paint(canvas, displayScale, displayDX, displayDY);
         }
 
         private void updateGameState() {
-            if (mFrozenGame.play(mLeft || mWasLeft, mRight || mWasRight,
-                    mFire || mUp || mWasFire || mWasUp || mTouchFire,
-                    mTrackballDX, mTouchDX)) {
-                mFrozenGame = new FrozenGame(mBackground, mBubbles,
-                        mHurry, mCompressorHead,
-                        mLauncher,
-                        mLevelManager);
+            if (frozenGame.play(left || wasLeft, right || wasRight,
+                    fire || up || wasFire || wasUp || touchFire,
+                    trackballDX, touchDX)) {
+                frozenGame = new FrozenGame(background, bubbles,
+                        hurry, compressorHead,
+                        launcher,
+                        levelManager);
             }
-            mWasLeft = false;
-            mWasRight = false;
-            mWasFire = false;
-            mWasUp = false;
-            mTrackballDX = 0;
-            mTouchFire = false;
-            mTouchDX = 0;
+            wasLeft = false;
+            wasRight = false;
+            wasFire = false;
+            wasUp = false;
+            trackballDX = 0;
+            touchFire = false;
+            touchDX = 0;
         }
 
         public void cleanUp() {
-            synchronized (mSurfaceHolder) {
-                mImagesReady = false;
-                boolean imagesScaled = (mBackgroundOrig == mBackground.bmp);
-                mBackgroundOrig.recycle();
-                mBackgroundOrig = null;
-                for (int i = 0; i < mBubblesOrig.length; i++) {
-                    mBubblesOrig[i].recycle();
-                    mBubblesOrig[i] = null;
+            synchronized (surfaceHolder) {
+                imagesReady = false;
+                boolean imagesScaled = (backgroundOrig == background.bmp);
+                backgroundOrig.recycle();
+                backgroundOrig = null;
+                for (int i = 0; i < bubblesOrig.length; i++) {
+                    bubblesOrig[i].recycle();
+                    bubblesOrig[i] = null;
                 }
-                mBubblesOrig = null;
-                mHurryOrig.recycle();
-                mHurryOrig = null;
+                bubblesOrig = null;
+                hurryOrig.recycle();
+                hurryOrig = null;
 
                 if (imagesScaled) {
-                    mBackground.bmp.recycle();
-                    for (int i = 0; i < mBubbles.length; i++) {
-                        mBubbles[i].bmp.recycle();
+                    background.bmp.recycle();
+                    for (int i = 0; i < bubbles.size(); i++) {
+                        bubbles.get(i).bmp.recycle();
                     }
-                    mHurry.bmp.recycle();
-                    mCompressorHead.bmp.recycle();
+                    hurry.bmp.recycle();
+                    compressorHead.bmp.recycle();
                 }
-                mBackground.bmp = null;
-                mBackground = null;
-                for (int i = 0; i < mBubbles.length; i++) {
-                    mBubbles[i].bmp = null;
-                    mBubbles[i] = null;
-                }
-                mBubbles = null;
-                mHurry.bmp = null;
-                mHurry = null;
-                mCompressorHead.bmp = null;
-                mCompressorHead = null;
+                background.bmp = null;
+                background = null;
+                bubbles = null;
+                hurry.bmp = null;
+                hurry = null;
+                compressorHead.bmp = null;
+                compressorHead = null;
 
-                mImageList = null;
-                mLevelManager = null;
-                mFrozenGame = null;
+                imageList = null;
+                levelManager = null;
+                frozenGame = null;
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.mirallax.android.bubble.sprite;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import android.graphics.Canvas;
@@ -168,7 +169,7 @@ public class BubbleSprite extends Sprite {
         realY += moveY;
 
         Point currentPosition = currentPosition();
-        Vector neighbors = getNeighbors(currentPosition);
+        ArrayList neighbors = getNeighbors(currentPosition);
 
         if (checkCollision(neighbors) || realY < 44. + frozen.getMoveDown()) {
             realX = 190. + currentPosition.x * 32 - (currentPosition.y % 2) * 16;
@@ -176,7 +177,7 @@ public class BubbleSprite extends Sprite {
 
             fixed = true;
 
-            Vector checkJump = new Vector();
+            ArrayList checkJump = new ArrayList();
             this.checkJump(checkJump, neighbors);
 
             BubbleSprite[][] grid = frozen.getGrid();
@@ -185,7 +186,7 @@ public class BubbleSprite extends Sprite {
                 released = true;
 
                 for (int i = 0; i < checkJump.size(); i++) {
-                    BubbleSprite current = (BubbleSprite) checkJump.elementAt(i);
+                    BubbleSprite current = (BubbleSprite) checkJump.get(i);
                     Point currentPoint = current.currentPosition();
 
                     frozen.addJumpingBubble(current);
@@ -225,61 +226,61 @@ public class BubbleSprite extends Sprite {
         super.absoluteMove(new Point((int) realX, (int) realY));
     }
 
-    Vector getNeighbors(Point p) {
+    ArrayList getNeighbors(Point p) {
         BubbleSprite[][] grid = frozen.getGrid();
 
-        Vector list = new Vector();
+        ArrayList list = new ArrayList();
 
         if ((p.y % 2) == 0) {
             if (p.x > 0) {
-                list.addElement(grid[p.x - 1][p.y]);
+                list.add(grid[p.x - 1][p.y]);
             }
 
             if (p.x < 7) {
-                list.addElement(grid[p.x + 1][p.y]);
+                list.add(grid[p.x + 1][p.y]);
 
                 if (p.y > 0) {
-                    list.addElement(grid[p.x][p.y - 1]);
-                    list.addElement(grid[p.x + 1][p.y - 1]);
+                    list.add(grid[p.x][p.y - 1]);
+                    list.add(grid[p.x + 1][p.y - 1]);
                 }
 
                 if (p.y < 12) {
-                    list.addElement(grid[p.x][p.y + 1]);
-                    list.addElement(grid[p.x + 1][p.y + 1]);
+                    list.add(grid[p.x][p.y + 1]);
+                    list.add(grid[p.x + 1][p.y + 1]);
                 }
             } else {
                 if (p.y > 0) {
-                    list.addElement(grid[p.x][p.y - 1]);
+                    list.add(grid[p.x][p.y - 1]);
                 }
 
                 if (p.y < 12) {
-                    list.addElement(grid[p.x][p.y + 1]);
+                    list.add(grid[p.x][p.y + 1]);
                 }
             }
         } else {
             if (p.x < 7) {
-                list.addElement(grid[p.x + 1][p.y]);
+                list.add(grid[p.x + 1][p.y]);
             }
 
             if (p.x > 0) {
-                list.addElement(grid[p.x - 1][p.y]);
+                list.add(grid[p.x - 1][p.y]);
 
                 if (p.y > 0) {
-                    list.addElement(grid[p.x][p.y - 1]);
-                    list.addElement(grid[p.x - 1][p.y - 1]);
+                    list.add(grid[p.x][p.y - 1]);
+                    list.add(grid[p.x - 1][p.y - 1]);
                 }
 
                 if (p.y < 12) {
-                    list.addElement(grid[p.x][p.y + 1]);
-                    list.addElement(grid[p.x - 1][p.y + 1]);
+                    list.add(grid[p.x][p.y + 1]);
+                    list.add(grid[p.x - 1][p.y + 1]);
                 }
             } else {
                 if (p.y > 0) {
-                    list.addElement(grid[p.x][p.y - 1]);
+                    list.add(grid[p.x][p.y - 1]);
                 }
 
                 if (p.y < 12) {
-                    list.addElement(grid[p.x][p.y + 1]);
+                    list.add(grid[p.x][p.y + 1]);
                 }
             }
         }
@@ -287,7 +288,7 @@ public class BubbleSprite extends Sprite {
         return list;
     }
 
-    void checkJump(Vector jump, BmpWrap compare) {
+    void checkJump(ArrayList jump, BmpWrap compare) {
         if (checkJump) {
             return;
         }
@@ -298,11 +299,11 @@ public class BubbleSprite extends Sprite {
         }
     }
 
-    void checkJump(Vector jump, Vector neighbors) {
-        jump.addElement(this);
+    void checkJump(ArrayList jump, ArrayList neighbors) {
+        jump.add(this);
 
         for (int i = 0; i < neighbors.size(); i++) {
-            BubbleSprite current = (BubbleSprite) neighbors.elementAt(i);
+            BubbleSprite current = (BubbleSprite) neighbors.get(i);
 
             if (current != null) {
                 current.checkJump(jump, this.bubbleFace);
@@ -316,10 +317,10 @@ public class BubbleSprite extends Sprite {
         }
         checkFall = true;
 
-        Vector v = this.getNeighbors(this.currentPosition());
+        ArrayList v = this.getNeighbors(this.currentPosition());
 
         for (int i = 0; i < v.size(); i++) {
-            BubbleSprite current = (BubbleSprite) v.elementAt(i);
+            BubbleSprite current = (BubbleSprite) v.get(i);
 
             if (current != null) {
                 current.checkFall();
@@ -327,9 +328,9 @@ public class BubbleSprite extends Sprite {
         }
     }
 
-    boolean checkCollision(Vector neighbors) {
+    boolean checkCollision(ArrayList neighbors) {
         for (int i = 0; i < neighbors.size(); i++) {
-            BubbleSprite current = (BubbleSprite) neighbors.elementAt(i);
+            BubbleSprite current = (BubbleSprite) neighbors.get(i);
 
             if (current != null) {
                 if (checkCollision(current)) {

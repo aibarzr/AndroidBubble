@@ -14,6 +14,7 @@ import com.mirallax.android.bubble.sprite.ImageSprite;
 import com.mirallax.android.bubble.sprite.LaunchBubbleSprite;
 import com.mirallax.android.bubble.sprite.Sprite;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class FrozenGame extends GameScreen {
     boolean levelCompleted = false;
 
     BmpWrap background;
-    BmpWrap[] bubbles;
+    ArrayList<BmpWrap> bubbles;
     Random random;
 
     LaunchBubbleSprite launchBubble;
@@ -62,20 +63,20 @@ public class FrozenGame extends GameScreen {
     Drawable launcher;
 
     public FrozenGame(BmpWrap background_arg,
-                      BmpWrap[] bubbles_arg,
+                      ArrayList<BmpWrap> bubbles,
                       BmpWrap hurry_arg,
                       BmpWrap compressorHead_arg,
                       Drawable launcher_arg,
                       LevelManager levelManager_arg) {
         random = new Random(System.currentTimeMillis());
-        launcher = launcher_arg;
-        background = background_arg;
-        bubbles = bubbles_arg;
-        levelManager = levelManager_arg;
+        this.launcher = launcher_arg;
+        this.background = background_arg;
+        this.bubbles = bubbles;
+        this.levelManager = levelManager_arg;
 
         launchBubblePosition = 20;
 
-        compressor = new Compressor(compressorHead_arg);
+        this.compressor = new Compressor(compressorHead_arg);
 
         hurrySprite = new ImageSprite(new Rect(203, 265, 203 + 240, 265 + 90),
                 hurry_arg);
@@ -99,7 +100,7 @@ public class FrozenGame extends GameScreen {
                     BubbleSprite newOne = new BubbleSprite(
                             new Rect(190 + i * 32 - (j % 2) * 16, 44 + j * 28, 32, 32),
                             currentLevel[i][j],
-                            bubbles[currentLevel[i][j]],
+                            bubbles.get(currentLevel[i][j]),
                             bubbleManager,
                             this);
                     bubblePlay[i][j] = newOne;
@@ -112,7 +113,7 @@ public class FrozenGame extends GameScreen {
         nextColor = bubbleManager.nextBubbleIndex(random);
 
         nextBubble = new ImageSprite(new Rect(302, 440, 302 + 32, 440 + 32),
-                bubbles[nextColor]);
+                bubbles.get(nextColor));
         this.addSprite(nextBubble);
 
         launchBubble = new LaunchBubbleSprite(currentColor,
@@ -202,7 +203,7 @@ public class FrozenGame extends GameScreen {
                     color, moveX, moveY, realX, realY,
                     fixed, released, checkJump, checkFall,
                     fixedAnim,
-                    bubbles[color],
+                    bubbles.get(color),
                     bubbleManager, this);
         } else if (type == Sprite.TYPE_IMAGE) {
             int imageId = map.getInt(String.format("%d-imageId", i));
@@ -356,14 +357,14 @@ public class FrozenGame extends GameScreen {
                     movingBubble = new BubbleSprite(new Rect(302, 390, 32, 32),
                             (int) launchBubblePosition,
                             currentColor,
-                            bubbles[currentColor],
+                            bubbles.get(currentColor),
                             bubbleManager, this);
                     this.addSprite(movingBubble);
 
                     currentColor = nextColor;
                     nextColor = bubbleManager.nextBubbleIndex(random);
 
-                    nextBubble.changeImage(bubbles[nextColor]);
+                    nextBubble.changeImage(bubbles.get(nextColor));
                     launchBubble.changeColor(currentColor);
 
                     readyToFire = false;
@@ -458,7 +459,7 @@ public class FrozenGame extends GameScreen {
 
     public void paint(Canvas c, double scale, int dx, int dy) {
         compressor.paint(c, scale, dx, dy);
-        nextBubble.changeImage(bubbles[nextColor]);
+        nextBubble.changeImage(bubbles.get(nextColor));
         super.paint(c, scale, dx, dy);
     }
 }

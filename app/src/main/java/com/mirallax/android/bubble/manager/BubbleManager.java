@@ -1,5 +1,6 @@
 package com.mirallax.android.bubble.manager;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.os.Bundle;
@@ -7,13 +8,13 @@ import android.os.Bundle;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 
 public class BubbleManager {
+    private int[] countBubbles;
     int bubblesLeft;
-    BmpWrap[] bubbles;
-    int[] countBubbles;
+    ArrayList<BmpWrap> bubbles;
 
-    public BubbleManager(BmpWrap[] bubbles) {
+    public BubbleManager(ArrayList<BmpWrap> bubbles) {
         this.bubbles = bubbles;
-        this.countBubbles = new int[bubbles.length];
+        this.countBubbles = new int[bubbles.size()];
         this.bubblesLeft = 0;
     }
 
@@ -42,7 +43,7 @@ public class BubbleManager {
     }
 
     public int nextBubbleIndex(Random rand) {
-        int select = rand.nextInt() % bubbles.length;
+        int select = rand.nextInt() % bubbles.size();
 
         if (select < 0) {
             select = -select;
@@ -54,7 +55,7 @@ public class BubbleManager {
         while (count != select) {
             position++;
 
-            if (position == bubbles.length) {
+            if (position == bubbles.size()) {
                 position = 0;
             }
 
@@ -67,8 +68,8 @@ public class BubbleManager {
     }
 
     private int findBubble(BmpWrap bubble) {
-        for (int i = 0; i < bubbles.length; i++) {
-            if (bubbles[i] == bubble) {
+        for (int i = 0; i < bubbles.size(); i++) {
+            if (bubbles.get(i) == bubble) {
                 return i;
             }
         }
