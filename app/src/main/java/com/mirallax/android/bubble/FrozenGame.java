@@ -90,7 +90,6 @@ public class FrozenGame extends GameScreen {
         byte[][] currentLevel = levelManager.getCurrentLevel();
 
         if (currentLevel == null) {
-            //Log.i("frozen-bubble", "Level not available.");
             return;
         }
 
@@ -126,7 +125,7 @@ public class FrozenGame extends GameScreen {
     }
 
     public void saveState(Bundle map) {
-        Vector savedSprites = new Vector();
+        ArrayList savedSprites = new ArrayList();
         saveSprites(map, savedSprites);
         for (int i = 0; i < jumping.size(); i++) {
             ((Sprite) jumping.elementAt(i)).saveState(map, savedSprites);
@@ -178,7 +177,7 @@ public class FrozenGame extends GameScreen {
         map.putInt("numSavedSprites", savedSprites.size());
 
         for (int i = 0; i < savedSprites.size(); i++) {
-            ((Sprite) savedSprites.elementAt(i)).clearSavedId();
+            ((Sprite) savedSprites.get(i)).clearSavedId();
         }
     }
 

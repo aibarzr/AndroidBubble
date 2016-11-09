@@ -25,7 +25,7 @@ public class LaunchBubbleSprite extends Sprite {
         this.bubbles = bubbles;
     }
 
-    public void saveState(Bundle map, Vector saved_sprites) {
+    public void saveState(Bundle map, ArrayList saved_sprites) {
         if (getSavedId() != -1) {
             return;
         }

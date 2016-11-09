@@ -531,7 +531,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
-        //Log.i("frozen-bubble", "GameView.onWindowFocusChanged()");
         if (!hasWindowFocus) {
             thread.pause();
         }

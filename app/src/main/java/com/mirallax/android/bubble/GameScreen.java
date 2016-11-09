@@ -1,5 +1,6 @@
 package com.mirallax.android.bubble;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import android.graphics.Canvas;
@@ -10,7 +11,7 @@ import com.mirallax.android.bubble.sprite.Sprite;
 public abstract class GameScreen {
     private Vector sprites;
 
-    public final void saveSprites(Bundle map, Vector savedSprites) {
+    public final void saveSprites(Bundle map, ArrayList savedSprites) {
         for (int i = 0; i < sprites.size(); i++) {
             ((Sprite) sprites.elementAt(i)).saveState(map, savedSprites);
             map.putInt(String.format("game-%d", i),

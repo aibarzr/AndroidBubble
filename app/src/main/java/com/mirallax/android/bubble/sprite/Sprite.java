@@ -7,6 +7,7 @@ import android.graphics.Region;
 import android.os.Bundle;
 
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public abstract class Sprite {
@@ -21,12 +22,12 @@ public abstract class Sprite {
         saved_id = -1;
     }
 
-    public void saveState(Bundle map, Vector saved_sprites) {
+    public void saveState(Bundle map, ArrayList saved_sprites) {
         if (saved_id != -1) {
             return;
         }
         saved_id = saved_sprites.size();
-        saved_sprites.addElement(this);
+        saved_sprites.add(this);
         map.putInt(String.format("%d-left", saved_id), spriteArea.left);
         map.putInt(String.format("%d-right", saved_id), spriteArea.right);
         map.putInt(String.format("%d-top", saved_id), spriteArea.top);
@@ -44,9 +45,9 @@ public abstract class Sprite {
 
     public abstract int getTypeId();
 
-    public final void absoluteMove(Point p) {
+    public final void absoluteMove(Point point) {
         spriteArea = new Rect(spriteArea);
-        spriteArea.offsetTo(p.x, p.y);
+        spriteArea.offsetTo(point.x, point.y);
     }
 
     public final Point getSpritePosition() {

@@ -32,7 +32,7 @@ public class BubbleSprite extends Sprite {
     private int fixedAnim;
 
 
-    public void saveState(Bundle map, Vector savedSprites) {
+    public void saveState(Bundle map, ArrayList savedSprites) {
         if (getSavedId() != -1) {
             return;
         }
@@ -226,61 +226,61 @@ public class BubbleSprite extends Sprite {
         super.absoluteMove(new Point((int) realX, (int) realY));
     }
 
-    ArrayList getNeighbors(Point p) {
+    ArrayList getNeighbors(Point point) {
         BubbleSprite[][] grid = frozen.getGrid();
 
         ArrayList list = new ArrayList();
 
-        if ((p.y % 2) == 0) {
-            if (p.x > 0) {
-                list.add(grid[p.x - 1][p.y]);
+        if ((point.y % 2) == 0) {
+            if (point.x > 0) {
+                list.add(grid[point.x - 1][point.y]);
             }
 
-            if (p.x < 7) {
-                list.add(grid[p.x + 1][p.y]);
+            if (point.x < 7) {
+                list.add(grid[point.x + 1][point.y]);
 
-                if (p.y > 0) {
-                    list.add(grid[p.x][p.y - 1]);
-                    list.add(grid[p.x + 1][p.y - 1]);
+                if (point.y > 0) {
+                    list.add(grid[point.x][point.y - 1]);
+                    list.add(grid[point.x + 1][point.y - 1]);
                 }
 
-                if (p.y < 12) {
-                    list.add(grid[p.x][p.y + 1]);
-                    list.add(grid[p.x + 1][p.y + 1]);
+                if (point.y < 12) {
+                    list.add(grid[point.x][point.y + 1]);
+                    list.add(grid[point.x + 1][point.y + 1]);
                 }
             } else {
-                if (p.y > 0) {
-                    list.add(grid[p.x][p.y - 1]);
+                if (point.y > 0) {
+                    list.add(grid[point.x][point.y - 1]);
                 }
 
-                if (p.y < 12) {
-                    list.add(grid[p.x][p.y + 1]);
+                if (point.y < 12) {
+                    list.add(grid[point.x][point.y + 1]);
                 }
             }
         } else {
-            if (p.x < 7) {
-                list.add(grid[p.x + 1][p.y]);
+            if (point.x < 7) {
+                list.add(grid[point.x + 1][point.y]);
             }
 
-            if (p.x > 0) {
-                list.add(grid[p.x - 1][p.y]);
+            if (point.x > 0) {
+                list.add(grid[point.x - 1][point.y]);
 
-                if (p.y > 0) {
-                    list.add(grid[p.x][p.y - 1]);
-                    list.add(grid[p.x - 1][p.y - 1]);
+                if (point.y > 0) {
+                    list.add(grid[point.x][point.y - 1]);
+                    list.add(grid[point.x - 1][point.y - 1]);
                 }
 
-                if (p.y < 12) {
-                    list.add(grid[p.x][p.y + 1]);
-                    list.add(grid[p.x - 1][p.y + 1]);
+                if (point.y < 12) {
+                    list.add(grid[point.x][point.y + 1]);
+                    list.add(grid[point.x - 1][point.y + 1]);
                 }
             } else {
-                if (p.y > 0) {
-                    list.add(grid[p.x][p.y - 1]);
+                if (point.y > 0) {
+                    list.add(grid[point.x][point.y - 1]);
                 }
 
-                if (p.y < 12) {
-                    list.add(grid[p.x][p.y + 1]);
+                if (point.y < 12) {
+                    list.add(grid[point.x][point.y + 1]);
                 }
             }
         }
@@ -393,9 +393,9 @@ public class BubbleSprite extends Sprite {
         checkJump = false;
         checkFall = false;
 
-        Point p = getSpritePosition();
+        Point point = getSpritePosition();
 
-        drawImage(bubbleFace, p.x, p.y, c, scale, dx, dy);
+        drawImage(bubbleFace, point.x, point.y, c, scale, dx, dy);
 
         if (fixedAnim != -1) {
             fixedAnim++;

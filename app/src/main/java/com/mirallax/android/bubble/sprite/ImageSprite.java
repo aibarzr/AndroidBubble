@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class ImageSprite extends Sprite {
@@ -17,7 +18,7 @@ public class ImageSprite extends Sprite {
         this.image = image;
     }
 
-    public void saveState(Bundle map, Vector savedSprites) {
+    public void saveState(Bundle map, ArrayList savedSprites) {
         if (getSavedId() != -1) {
             return;
         }
