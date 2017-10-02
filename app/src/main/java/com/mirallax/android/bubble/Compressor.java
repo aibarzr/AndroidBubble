@@ -32,4 +32,4 @@ public class Compressor {
                 (float) ((-7 + 28 * steps) * scale + dy),
                 null);
     }
-};
+}
