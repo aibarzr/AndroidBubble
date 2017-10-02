@@ -6,8 +6,8 @@ import android.os.Bundle;
 import com.mirallax.android.bubble.sprite.BmpWrap;
 
 public class Compressor {
-    private BmpWrap compressorHead;
-    int steps;
+    private final BmpWrap compressorHead;
+    private int steps;
 
     public Compressor(BmpWrap compressorHead) {
         this.compressorHead = compressorHead;
