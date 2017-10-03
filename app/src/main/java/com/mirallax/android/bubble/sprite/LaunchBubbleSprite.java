@@ -6,17 +6,17 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Locale;
 
 public class LaunchBubbleSprite extends Sprite {
     private int currentColor;
     private int currentDirection;
-    private Drawable launcher;
-    private ArrayList<BmpWrap> bubbles;
+    private final Drawable launcher;
+    private final ArrayList<BmpWrap> bubbles;
 
     public LaunchBubbleSprite(int initialColor, int initialDirection,
                               Drawable launcher,
-                              ArrayList bubbles) {
+                              ArrayList<BmpWrap> bubbles) {
         super(new Rect(276, 362, 276 + 86, 362 + 76));
 
         currentColor = initialColor;
@@ -30,8 +30,8 @@ public class LaunchBubbleSprite extends Sprite {
             return;
         }
         super.saveState(map, saved_sprites);
-        map.putInt(String.format("%d-currentColor", getSavedId()), currentColor);
-        map.putInt(String.format("%d-currentDirection", getSavedId()),
+        map.putInt(String.format(Locale.getDefault(), "%d-currentColor", getSavedId()), currentColor);
+        map.putInt(String.format(Locale.getDefault(), "%d-currentDirection", getSavedId()),
                 currentDirection);
     }
 

@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Locale;
 
 public class ImageSprite extends Sprite {
     private BmpWrap image;
@@ -23,7 +23,7 @@ public class ImageSprite extends Sprite {
             return;
         }
         super.saveState(map, savedSprites);
-        map.putInt(String.format("%d-imageId", getSavedId()), image.id);
+        map.putInt(String.format(Locale.getDefault(), "%d-imageId", getSavedId()), image.id);
     }
 
     public int getTypeId() {

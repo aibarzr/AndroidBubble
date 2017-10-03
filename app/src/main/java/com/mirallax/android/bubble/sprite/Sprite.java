@@ -3,12 +3,11 @@ package com.mirallax.android.bubble.sprite;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.Region;
 import android.os.Bundle;
 
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Locale;
 
 public abstract class Sprite {
     public static int TYPE_BUBBLE = 1;
@@ -22,17 +21,17 @@ public abstract class Sprite {
         saved_id = -1;
     }
 
-    public void saveState(Bundle map, ArrayList saved_sprites) {
+    public void saveState(Bundle map, ArrayList<Sprite> saved_sprites) {
         if (saved_id != -1) {
             return;
         }
         saved_id = saved_sprites.size();
         saved_sprites.add(this);
-        map.putInt(String.format("%d-left", saved_id), spriteArea.left);
-        map.putInt(String.format("%d-right", saved_id), spriteArea.right);
-        map.putInt(String.format("%d-top", saved_id), spriteArea.top);
-        map.putInt(String.format("%d-bottom", saved_id), spriteArea.bottom);
-        map.putInt(String.format("%d-type", saved_id), getTypeId());
+        map.putInt(String.format(Locale.getDefault(), "%d-left", saved_id), spriteArea.left);
+        map.putInt(String.format(Locale.getDefault(), "%d-right", saved_id), spriteArea.right);
+        map.putInt(String.format(Locale.getDefault(), "%d-top", saved_id), spriteArea.top);
+        map.putInt(String.format(Locale.getDefault(), "%d-bottom", saved_id), spriteArea.bottom);
+        map.putInt(String.format(Locale.getDefault(), "%d-type", saved_id), getTypeId());
     }
 
     public final int getSavedId() {
