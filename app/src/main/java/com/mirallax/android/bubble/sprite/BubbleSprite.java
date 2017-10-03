@@ -9,16 +9,15 @@ import com.mirallax.android.bubble.FrozenGame;
 import com.mirallax.android.bubble.manager.BubbleManager;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class BubbleSprite extends Sprite {
-    private static double FALL_SPEED = 1.;
-    private static double MAX_BUBBLE_SPEED = 8.;
-    private static double MINIMUM_DISTANCE = 841.;
+    private static final double FALL_SPEED = 1.;
 
-    private int color;
-    private BmpWrap bubbleFace;
-    private FrozenGame frozen;
-    private BubbleManager bubbleManager;
+    private final int color;
+    private final BmpWrap bubbleFace;
+    private final FrozenGame frozen;
+    private final BubbleManager bubbleManager;
     private double moveX, moveY;
     private double realX, realY;
 
@@ -63,6 +62,7 @@ public class BubbleSprite extends Sprite {
         this.bubbleManager = bubbleManager;
         this.frozen = frozen;
 
+        double MAX_BUBBLE_SPEED = 8.;
         this.moveX = MAX_BUBBLE_SPEED * -Math.cos(direction * Math.PI / 40.);
         this.moveY = MAX_BUBBLE_SPEED * -Math.sin(direction * Math.PI / 40.);
         this.realX = area.left;
@@ -96,32 +96,32 @@ public class BubbleSprite extends Sprite {
         }
         super.saveState(map, savedSprites);
         String color = "%d-color";
-        map.putInt(String.format(color, getSavedId()), this.color);
+        map.putInt(String.format(Locale.getDefault(), color, getSavedId()), this.color);
         String moveX = "%d-moveX";
-        map.putDouble(String.format(moveX, getSavedId()), this.moveX);
+        map.putDouble(String.format(Locale.getDefault(), moveX, getSavedId()), this.moveX);
         String moveY = "%d-moveY";
-        map.putDouble(String.format(moveY, getSavedId()), this.moveY);
+        map.putDouble(String.format(Locale.getDefault(), moveY, getSavedId()), this.moveY);
         String realX = "%d-realX";
-        map.putDouble(String.format(realX, getSavedId()), this.realX);
+        map.putDouble(String.format(Locale.getDefault(), realX, getSavedId()), this.realX);
         String realY = "%d-realY";
-        map.putDouble(String.format(realY, getSavedId()), this.realY);
+        map.putDouble(String.format(Locale.getDefault(), realY, getSavedId()), this.realY);
         String fixed = "%d-fixed";
-        map.putBoolean(String.format(fixed, getSavedId()), this.fixed);
+        map.putBoolean(String.format(Locale.getDefault(), fixed, getSavedId()), this.fixed);
         String released = "%d-released";
-        map.putBoolean(String.format(released, getSavedId()), this.released);
+        map.putBoolean(String.format(Locale.getDefault(), released, getSavedId()), this.released);
         String checkJump = "%d-checkJump";
-        map.putBoolean(String.format(checkJump, getSavedId()), this.checkJump);
+        map.putBoolean(String.format(Locale.getDefault(), checkJump, getSavedId()), this.checkJump);
         String checkFall = "%d-checkFall";
-        map.putBoolean(String.format(checkFall, getSavedId()), this.checkFall);
+        map.putBoolean(String.format(Locale.getDefault(), checkFall, getSavedId()), this.checkFall);
         String fixedAnim = "%d-fixedAnim";
-        map.putInt(String.format(fixedAnim, getSavedId()), this.fixedAnim);
+        map.putInt(String.format(Locale.getDefault(), fixedAnim, getSavedId()), this.fixedAnim);
     }
 
     public int getTypeId() {
         return TYPE_BUBBLE;
     }
 
-    Point currentPosition() {
+    private Point currentPosition() {
         int posY = (int) Math.floor((realY - 28. - frozen.getmDown()) / 28.);
         int posX = (int) Math.floor((realX - 174.) / 32. + 0.5 * (posY % 2));
 
@@ -140,7 +140,7 @@ public class BubbleSprite extends Sprite {
         return new Point(posX, posY);
     }
 
-    public void removeFromManager() {
+    private void removeFromManager() {
         bubbleManager.removeBubble(bubbleFace);
     }
 
@@ -148,7 +148,7 @@ public class BubbleSprite extends Sprite {
         return fixed;
     }
 
-    public boolean checked() {
+    private boolean checked() {
         return checkFall;
     }
 
@@ -186,7 +186,7 @@ public class BubbleSprite extends Sprite {
 
             fixed = true;
 
-            ArrayList checkJump = new ArrayList();
+            ArrayList <BubbleSprite> checkJump = new ArrayList<> ();
             this.checkJump(checkJump, neighbors);
 
             BubbleSprite[][] grid = frozen.getGrid();
@@ -195,7 +195,7 @@ public class BubbleSprite extends Sprite {
                 released = true;
 
                 for (int i = 0; i < checkJump.size(); i++) {
-                    BubbleSprite current = (BubbleSprite) checkJump.get(i);
+                    BubbleSprite current = checkJump.get(i);
                     Point currentPoint = current.currentPosition();
 
                     frozen.addJumpingBubble(current);
@@ -235,10 +235,10 @@ public class BubbleSprite extends Sprite {
         super.absoluteMove(new Point((int) realX, (int) realY));
     }
 
-    ArrayList getNeighbors(Point point) {
+    private ArrayList getNeighbors(Point point) {
         BubbleSprite[][] grid = frozen.getGrid();
 
-        ArrayList list = new ArrayList();
+        ArrayList<BubbleSprite> list = new ArrayList<>();
 
         if ((point.y % 2) == 0) {
             if (point.x > 0) {
@@ -297,7 +297,7 @@ public class BubbleSprite extends Sprite {
         return list;
     }
 
-    void checkJump(ArrayList jump, BmpWrap compare) {
+    private void checkJump(ArrayList<BubbleSprite> jump, BmpWrap compare) {
         if (checkJump) {
             return;
         }
@@ -308,7 +308,7 @@ public class BubbleSprite extends Sprite {
         }
     }
 
-    void checkJump(ArrayList jump, ArrayList neighbors) {
+    private void checkJump(ArrayList<BubbleSprite> jump, ArrayList neighbors) {
         jump.add(this);
 
         for (int i = 0; i < neighbors.size(); i++) {
@@ -320,7 +320,7 @@ public class BubbleSprite extends Sprite {
         }
     }
 
-    public void checkFall() {
+    private void checkFall() {
         if (checkFall) {
             return;
         }
@@ -337,7 +337,7 @@ public class BubbleSprite extends Sprite {
         }
     }
 
-    boolean checkCollision(ArrayList neighbors) {
+    private boolean checkCollision(ArrayList neighbors) {
         for (int i = 0; i < neighbors.size(); i++) {
             BubbleSprite current = (BubbleSprite) neighbors.get(i);
 
@@ -351,13 +351,14 @@ public class BubbleSprite extends Sprite {
         return false;
     }
 
-    boolean checkCollision(BubbleSprite sprite) {
+    private boolean checkCollision(BubbleSprite sprite) {
         double value =
                 (sprite.getSpriteArea().left - this.realX) *
                         (sprite.getSpriteArea().left - this.realX) +
                         (sprite.getSpriteArea().top - this.realY) *
                                 (sprite.getSpriteArea().top - this.realY);
 
+        double MINIMUM_DISTANCE = 841.;
         return (value < MINIMUM_DISTANCE);
     }
 

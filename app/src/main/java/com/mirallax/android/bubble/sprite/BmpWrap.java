@@ -8,5 +8,5 @@ public class BmpWrap {
         this.id = id;
     }
     public Bitmap bmp;
-    public int id;
+    public final int id;
 }
